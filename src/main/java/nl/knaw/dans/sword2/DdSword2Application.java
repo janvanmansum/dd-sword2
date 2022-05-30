@@ -17,8 +17,43 @@
 package nl.knaw.dans.sword2;
 
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.forms.MultiPartBundle;
+import io.dropwizard.health.conf.HealthConfiguration;
+import io.dropwizard.health.core.HealthCheckBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.auth.SwordAuthenticator;
+import nl.knaw.dans.sword2.core.finalizer.DepositFinalizerEvent;
+import nl.knaw.dans.sword2.core.finalizer.DepositFinalizerManager;
+import nl.knaw.dans.sword2.core.service.BagExtractorImpl;
+import nl.knaw.dans.sword2.core.service.BagItManagerImpl;
+import nl.knaw.dans.sword2.core.service.ChecksumCalculatorImpl;
+import nl.knaw.dans.sword2.core.service.CollectionManagerImpl;
+import nl.knaw.dans.sword2.core.service.DepositHandlerImpl;
+import nl.knaw.dans.sword2.core.service.DepositPropertiesManagerImpl;
+import nl.knaw.dans.sword2.core.service.DepositReceiptFactoryImpl;
+import nl.knaw.dans.sword2.core.service.ErrorResponseFactoryImpl;
+import nl.knaw.dans.sword2.core.service.FileServiceImpl;
+import nl.knaw.dans.sword2.core.service.FilesystemSpaceVerifierImpl;
+import nl.knaw.dans.sword2.core.service.UserManagerImpl;
+import nl.knaw.dans.sword2.core.service.ZipServiceImpl;
+import nl.knaw.dans.sword2.health.DiskSpaceHealthCheck;
+import nl.knaw.dans.sword2.health.ExecutorQueueHealthCheck;
+import nl.knaw.dans.sword2.health.FileSystemPermissionHealthCheck;
+import nl.knaw.dans.sword2.health.QueueHealthCheck;
+import nl.knaw.dans.sword2.health.UploadDepositOnSameFileSystemHealthCheck;
+import nl.knaw.dans.sword2.resource.CollectionResourceImpl;
+import nl.knaw.dans.sword2.resource.ContainerResourceImpl;
+import nl.knaw.dans.sword2.resource.HashHeaderInterceptor;
+import nl.knaw.dans.sword2.resource.ServiceDocumentResourceImpl;
+import nl.knaw.dans.sword2.resource.StatementResourceImpl;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class DdSword2Application extends Application<DdSword2Configuration> {
 
@@ -33,12 +68,74 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
 
     @Override
     public void initialize(final Bootstrap<DdSword2Configuration> bootstrap) {
-        // TODO: application initialization
+        bootstrap.addBundle(new MultiPartBundle());
+        bootstrap.addBundle(new HealthCheckBundle<>() {
+
+            @Override
+            protected HealthConfiguration getHealthConfiguration(final DdSword2Configuration configuration) {
+                return configuration.getHealthConfiguration();
+            }
+        });
     }
 
     @Override
-    public void run(final DdSword2Configuration configuration, final Environment environment) {
+    public void run(final DdSword2Configuration configuration, final Environment environment) throws Exception {
+        var fileService = new FileServiceImpl();
+        var depositPropertiesManager = new DepositPropertiesManagerImpl();
+        var checksumCalculator = new ChecksumCalculatorImpl();
+        var filesystemSpaceVerifier = new FilesystemSpaceVerifierImpl(fileService);
 
+        var errorResponseFactory = new ErrorResponseFactoryImpl();
+
+        var bagItManager = new BagItManagerImpl(fileService, checksumCalculator);
+        var userManager = new UserManagerImpl(configuration.getUsers());
+
+        var finalizingExecutor = configuration.getSword2().getFinalizingQueue().build(environment);
+        var rescheduleExecutor = configuration.getSword2().getRescheduleQueue().build(environment);
+
+        var queue = new ArrayBlockingQueue<DepositFinalizerEvent>(configuration.getSword2().getFinalizingQueue().getMaxQueueSize());
+
+        var collectionManager = new CollectionManagerImpl(configuration.getSword2().getCollections());
+
+        var zipService = new ZipServiceImpl(fileService);
+
+        var bagExtractor = new BagExtractorImpl(zipService, fileService, bagItManager, filesystemSpaceVerifier);
+        var depositHandler = new DepositHandlerImpl(bagExtractor, fileService, depositPropertiesManager, collectionManager, userManager, queue, bagItManager,
+            filesystemSpaceVerifier, configuration.getSword2().getEmailAddress());
+
+        var depositReceiptFactory = new DepositReceiptFactoryImpl(configuration.getSword2().getBaseUrl());
+
+        var depositFinalizerManager = new DepositFinalizerManager(finalizingExecutor, depositHandler, queue, rescheduleExecutor, configuration.getSword2().getRescheduleDelay());
+
+        environment.jersey().register(MultiPartFeature.class);
+
+        // Set up authentication
+        environment.jersey().register(
+            new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<Depositor>().setAuthenticator(new SwordAuthenticator(configuration.getUsers())).setRealm("SWORD2").buildAuthFilter()));
+
+        // For @Auth
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Depositor.class));
+
+        // Managed classes
+        environment.lifecycle().manage(depositFinalizerManager);
+        environment.jersey().register(HashHeaderInterceptor.class);
+
+        // Resources
+        environment.jersey().register(new CollectionResourceImpl(depositHandler, depositReceiptFactory, errorResponseFactory));
+
+        environment.jersey().register(new ContainerResourceImpl(depositReceiptFactory, depositHandler, errorResponseFactory));
+
+        environment.jersey().register(new StatementResourceImpl(configuration.getSword2().getBaseUrl(), depositHandler, errorResponseFactory));
+
+        environment.jersey().register(new ServiceDocumentResourceImpl(configuration.getSword2().getCollections(), configuration.getSword2().getBaseUrl()));
+
+        // Health checks
+        var collections = configuration.getSword2().getCollections();
+        environment.healthChecks().register("DiskSpace", new DiskSpaceHealthCheck(collections, filesystemSpaceVerifier));
+        environment.healthChecks().register("UploadDepositIsOnSameFileSystem", new UploadDepositOnSameFileSystemHealthCheck(collections, fileService));
+        environment.healthChecks().register("FileSystemPermissions", new FileSystemPermissionHealthCheck(collections, fileService));
+        environment.healthChecks().register("FinalizerQueue", new QueueHealthCheck(queue));
+        environment.healthChecks().register("FinalizingExecutor", new ExecutorQueueHealthCheck(finalizingExecutor));
+        environment.healthChecks().register("RescheduleExecutor", new ExecutorQueueHealthCheck(rescheduleExecutor));
     }
-
 }

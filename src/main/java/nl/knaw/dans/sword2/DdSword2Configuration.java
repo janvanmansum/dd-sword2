@@ -18,9 +18,48 @@ package nl.knaw.dans.sword2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
+import io.dropwizard.health.conf.HealthConfiguration;
+import nl.knaw.dans.sword2.config.Sword2Config;
+import nl.knaw.dans.sword2.config.UserConfig;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class DdSword2Configuration extends Configuration {
 
+    @Valid
+    private List<UserConfig> users;
+
+    @Valid
+    private Sword2Config sword2;
+
+    @Valid
+    @NotNull
+    @JsonProperty("health")
+    private HealthConfiguration healthConfiguration = new HealthConfiguration();
+
+    public HealthConfiguration getHealthConfiguration() {
+        return healthConfiguration;
+    }
+
+    public void setHealthConfiguration(final HealthConfiguration healthConfiguration) {
+        this.healthConfiguration = healthConfiguration;
+    }
+
+    public Sword2Config getSword2() {
+        return sword2;
+    }
+
+    public void setSword2(Sword2Config sword2) {
+        this.sword2 = sword2;
+    }
+
+    public List<UserConfig> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserConfig> users) {
+        this.users = users;
+    }
 }
