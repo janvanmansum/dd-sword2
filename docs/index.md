@@ -1,7 +1,6 @@
 dd-sword2
 ===========
 
-<!-- Remove this comment and extend the descriptions below -->
 
 
 SYNOPSIS
