@@ -16,8 +16,7 @@
 
 site_name: dd-sword2
 theme:
-  name: dans
-  disclaimer: false
+  name: readthedocs
 
 repo_name: DANS-KNAW/dd-sword2
 repo_url: https://github.com/DANS-KNAW/dd-sword2
@@ -31,7 +30,6 @@ plugins:
 
 markdown_extensions:
   - attr_list
-  #- legacy_attr
   - admonition
   - codehilite:
       guess_lang: false
