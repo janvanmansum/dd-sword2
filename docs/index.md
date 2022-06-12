@@ -20,8 +20,8 @@ various important issues up to the implementer, the service adds some features. 
 contain detailed references to parts of the SWORDv2 specifications.
 
 ### Overview
-At the highest level `dd-sword2` is a service that accepts ZIP packages that comply with the [BagIt] packaging format and produces a [deposit directory]
-for each.
+At the highest level `dd-sword2` is a service that accepts ZIP packages that comply with the [BagIt]{:target=_blank} packaging format and produces a 
+[deposit directory]{:target=_blank} for each.
 
 ![Overview](img/overview.png){:width=50%}
 
