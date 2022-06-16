@@ -58,6 +58,10 @@ The service has the following interfaces.
 
 TODO
 
+#### Finalizing a deposit
+
+TODO
+
 #### Tracking post-submission processing
 
 TODO
