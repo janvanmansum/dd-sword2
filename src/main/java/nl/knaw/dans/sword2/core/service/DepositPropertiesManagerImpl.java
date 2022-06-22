@@ -75,7 +75,7 @@ public class DepositPropertiesManagerImpl implements DepositPropertiesManager {
             var config = builder.getConfiguration();
             return mapToDeposit(config);
         }
-        catch (ConfigurationException cex) {
+        catch (Throwable cex) {
             throw new InvalidDepositException("Unable to load deposit properties", cex);
         }
     }

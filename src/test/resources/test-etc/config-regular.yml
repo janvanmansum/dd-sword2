@@ -1,21 +1,20 @@
-
 server:
   applicationContextPath: /
   adminContextPath: /
   applicationConnectors:
     - type: http
       # Replace with port number unique for this service
-      port: 20000
+      port: 20320
   adminConnectors:
     - type: http
       # Replace with port number unique for this service
-      port: 20001
+      port: 20321
   requestLog:
     appenders: []
 
 users:
   - name: 'user001'
-    passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y'
+    passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y' # user001
     filepathMapping: true
     collections:
       - collection1
@@ -29,8 +28,15 @@ sword2:
       uploads: data/tmp/1/uploads
       deposits: data/tmp/1/deposits
       autoClean:
-        - REJECTED
-      diskSpaceMargin: 200000G
+        - INVALID
+      diskSpaceMargin: 2G
+    - name: 'collection2'
+      path: '2'
+      uploads: data/tmp/2/uploads
+      deposits: data/tmp/2/deposits
+      autoClean:
+        - INVALID
+      diskSpaceMargin: 2G
   rescheduleDelay: PT30S
   finalizingQueue:
     nameFormat: "finalization-worker-%d"
@@ -55,8 +61,21 @@ sword2:
 # See https://www.dropwizard.io/en/latest/manual/configuration.html#logging
 #
 logging:
-  level: off
+  level: "off"
 
 health:
   delayedShutdownHandlerEnabled: false
   initialOverallState: false
+  healthChecks:
+    - critical: true
+      name: DiskSpace
+    - critical: true
+      name: UploadDepositIsOnSameFileSystem
+    - critical: true
+      name: FileSystemPermissions
+    - critical: true
+      name: FinalizerQueue
+    - critical: true
+      name: FinalizingExecutor
+    - critical: true
+      name: RescheduleExecutor
