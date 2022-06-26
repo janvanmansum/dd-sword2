@@ -16,13 +16,12 @@ health:
   initialOverallState: false
 
 logging:
+  level: INFO
   appenders:
     - archive: false
       currentLogFilename: /var/opt/dans.knaw.nl/log/dd-sword2/dd-sword2.log
       type: file
-  level: INFO
-  loggers:
-    nl.knaw.dans: TRACE
+      timeZone: system
 
 server:
   applicationConnectors:
