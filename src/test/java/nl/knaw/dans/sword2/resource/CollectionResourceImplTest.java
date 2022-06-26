@@ -60,9 +60,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(DropwizardExtensionsSupport.class)
 class CollectionResourceImplTest {
 
-    private static DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
+    private final DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
         DdSword2Application.class,
-        ResourceHelpers.resourceFilePath("debug-etc/config.yml")
+        ResourceHelpers.resourceFilePath("test-etc/config-regular.yml")
     );
 
     @BeforeEach

@@ -10,7 +10,8 @@ server:
     - type: http
       # Replace with port number unique for this service
       port: 20001
-
+  requestLog:
+    appenders: [ ]
 
 users:
   - name: 'user001'
@@ -55,16 +56,7 @@ sword2:
 # See https://www.dropwizard.io/en/latest/manual/configuration.html#logging
 #
 logging:
-  level: INFO
-  loggers:
-    "nl.knaw.dans": TRACE
-  appenders:
-    - type: console
-      logFormat: "%-5p [%d{ISO8601}] [%t] %c: %m%n%rEx"
-
-    - type: file
-      archive: false
-      currentLogFilename: data/tmp/bagsender/dd-sword2.log
+  level: off
 
 health:
   delayedShutdownHandlerEnabled: false

@@ -50,7 +50,7 @@ class ServiceDocumentResourceImplTest {
             .get();
 
         var serviceDocument = result.readEntity(ServiceDocument.class);
-        printServiceDocument(serviceDocument);
+//        printServiceDocument(serviceDocument);
 
         assertEquals("2.0", serviceDocument.getVersion());
         assertEquals(1,
