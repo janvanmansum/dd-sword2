@@ -22,6 +22,6 @@
 /.dans.knaw.nl-yum-repo
 /venv
 
-.classpath
-.settings
-.project
+/.classpath
+/.settings
+/.project
