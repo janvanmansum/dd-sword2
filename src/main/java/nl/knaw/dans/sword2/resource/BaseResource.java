@@ -27,13 +27,13 @@ import javax.ws.rs.core.Response;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class BaseHandler {
-    private static final Logger log = LoggerFactory.getLogger(BaseHandler.class);
+public class BaseResource {
+    private static final Logger log = LoggerFactory.getLogger(BaseResource.class);
 
     private final ErrorResponseFactory errorResponseFactory;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z");
 
-    public BaseHandler(ErrorResponseFactory errorResponseFactory) {
+    public BaseResource(ErrorResponseFactory errorResponseFactory) {
         this.errorResponseFactory = errorResponseFactory;
     }
 
@@ -80,7 +80,7 @@ public class BaseHandler {
             }
         }
         catch (NumberFormatException e) {
-            log.error("Invalid content-length header: {}", header, e);
+            log.warn("Invalid content-length header: {}", header);
         }
 
         return -1L;

@@ -15,9 +15,11 @@
  */
 package nl.knaw.dans.sword2.resource;
 
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import nl.knaw.dans.sword2.core.exceptions.InvalidHeaderException;
 import nl.knaw.dans.sword2.core.service.ErrorResponseFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import javax.ws.rs.core.MediaType;
@@ -30,19 +32,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BaseHandlerTest {
+@ExtendWith(DropwizardExtensionsSupport.class)
+class BaseResourceTest {
     @Test
     void testDateFormat() {
         var date = OffsetDateTime.of(2022, 5, 18, 17, 18, 30, 40, ZoneOffset.UTC);
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
-        assertEquals("Wed, 18 May 2022 17:18:30 +0000", new BaseHandler(errorResponseFactory).formatDateTime(date));
+        var handler = new BaseResource(errorResponseFactory);
+        assertEquals("Wed, 18 May 2022 17:18:30 +0000", new BaseResource(errorResponseFactory).formatDateTime(date));
     }
 
     @Test
     void testEmptyContentDisposition() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
         assertNull(handler.getFilenameFromContentDisposition("attachment; filename=test.zip", "wrong key"));
         assertNull(handler.getFilenameFromContentDisposition("attachment", "does not matter"));
         assertNull(handler.getFilenameFromContentDisposition("", "does not matter"));
@@ -52,7 +55,7 @@ class BaseHandlerTest {
     @Test
     void testValidContentDisposition() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
         assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment; filename=test.zip", "filename"));
         assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment;     filename=test.zip", "filename"));
         assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment; name=test.zip", "name"));
@@ -61,7 +64,7 @@ class BaseHandlerTest {
     @Test
     void testContentLengthHeader() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
         assertEquals(123, handler.getContentLength("123"));
         assertEquals(-1, handler.getContentLength("letter3"));
         assertEquals(-1, handler.getContentLength("123suffix"));
@@ -69,11 +72,10 @@ class BaseHandlerTest {
         assertEquals(-1, handler.getContentLength(null));
     }
 
-
     @Test
     void testPackaging() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
 
         assertEquals("http://purl.org/net/sword/package/Binary", handler.getPackaging(null));
         assertEquals("input", handler.getPackaging("input"));
@@ -82,7 +84,7 @@ class BaseHandlerTest {
     @Test
     void testMediaType() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
 
         assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, handler.getContentType(null));
         assertEquals(MediaType.APPLICATION_XML, handler.getPackaging("application/xml"));
@@ -91,7 +93,7 @@ class BaseHandlerTest {
     @Test
     void testInProgress() throws InvalidHeaderException {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
-        var handler = new BaseHandler(errorResponseFactory);
+        var handler = new BaseResource(errorResponseFactory);
 
         assertTrue(handler.getInProgress("true"));
         assertFalse(handler.getInProgress("false"));
