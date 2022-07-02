@@ -34,13 +34,14 @@ server:
   applicationContextPath: /
 
 sword2:
-  baseUrl: https://dar.dans.knaw.nl/sword2/
-  emailAddress: test@test.com
+  baseUrl: # Fill in external base URL of service, e.g., https://yourserver.com/sword2/
+  emailAddress: # Admin e-mail address displayed in error messages to client
   collections:
     - name: collection1
       path: 1
       autoClean:
         - INVALID
+        - REJECTED
       deposits: /var/opt/dans.knaw.nl/tmp/auto-ingest/inbox
       uploads: /var/opt/dans.knaw.nl/tmp/sword2-uploads
       diskSpaceMargin: 2G
@@ -58,9 +59,32 @@ sword2:
     minThreads: 2
     nameFormat: reschedule-worker-%d
 
+#
+# Client user accounts.
+#
 users:
-  - collections:
-      - collection1
-    filepathMapping: true
-    name: user001
+
+  #
+  # Example user
+  #
+  - name: user001
+
+    # BCrypt encrypted password
     passwordHash: $2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y
+
+    # Collections that this user is allowed to send deposits to
+    collections:
+      - collection1
+
+    # If true, the payload files of received bags will renamed on extraction. The new name will be a newly created UUID. The mapping to the original path + name
+    # is kept in the file original-filepaths.txt in the root of the bag. This file has lines in with the following lay-out
+    #
+    # <new filename>  <original path + filename>
+    #
+    # for example:
+    #
+    # 5c08c155-a986-4833-b465-ab31a12288ae  data/path/to/original/file.txt
+    #
+    filepathMapping: true
+
+
