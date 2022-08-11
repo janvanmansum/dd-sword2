@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.resource;
 
+import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -58,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-class CollectionResourceImplTest {
+class CollectionResourceImplIntegrationTest {
 
     private final DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
         DdSword2Application.class,
@@ -74,12 +75,13 @@ class CollectionResourceImplTest {
     @AfterEach
     void tearDown() throws IOException {
         FileUtils.deleteDirectory(Path.of("data/tmp").toFile());
+        ((LoggerContext)org.slf4j.LoggerFactory.getILoggerFactory()).stop();
     }
 
     Builder buildRequest(String path) {
         var url = String.format("http://localhost:%s%s", EXT.getLocalPort(), path);
 
-        return EXT.client()
+        return RequestClientBuilder.buildClient()
             .target(url)
             .register(MultiPartFeature.class)
             .request()

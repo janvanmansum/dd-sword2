@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.resource;
 
+import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -52,8 +53,8 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-public class CollectionResourceBagSenderTest {
-    private static final Logger log = LoggerFactory.getLogger(CollectionResourceBagSenderTest.class);
+class CollectionResourceBagSenderIntegrationTest {
+    private static final Logger log = LoggerFactory.getLogger(CollectionResourceBagSenderIntegrationTest.class);
 
     private static final FileService fileService = new FileServiceImpl();
     private static final ChecksumCalculator checksumCalculator = new ChecksumCalculatorImpl();
@@ -80,6 +81,7 @@ public class CollectionResourceBagSenderTest {
     @AfterEach
     void tearDown() throws IOException {
         FileUtils.deleteDirectory(BASE_PATH.toFile());
+        ((LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory()).stop();
     }
 
     @Test
@@ -217,7 +219,8 @@ public class CollectionResourceBagSenderTest {
             if (deposit.getState().equals(DepositState.DRAFT) || deposit.getState().equals(DepositState.FINALIZING)) {
                 count += 1;
                 Thread.sleep(100);
-            } else {
+            }
+            else {
                 return deposit;
             }
         }
@@ -277,7 +280,8 @@ public class CollectionResourceBagSenderTest {
         var checksum = checksumCalculator.calculateChecksum(zipFile.getFile().toPath(), "MD5");
         var url = String.format("http://localhost:%s%s", EXT.getLocalPort(), "/collection/1");
 
-        return EXT.client().target(url)
+        return RequestClientBuilder.buildClient()
+            .target(url)
             .request()
             .header("content-type", "application/zip")
             .header("content-md5", checksum)

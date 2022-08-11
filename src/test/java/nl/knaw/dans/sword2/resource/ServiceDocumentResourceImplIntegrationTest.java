@@ -15,30 +15,35 @@
  */
 package nl.knaw.dans.sword2.resource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
+import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
-import java.io.StringWriter;
-import java.net.URI;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import nl.knaw.dans.sword2.DdSword2Application;
 import nl.knaw.dans.sword2.DdSword2Configuration;
 import nl.knaw.dans.sword2.api.service.ServiceDocument;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import javax.xml.bind.JAXBException;
+import java.net.URI;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 @ExtendWith(DropwizardExtensionsSupport.class)
-class ServiceDocumentResourceImplTest {
+class ServiceDocumentResourceImplIntegrationTest {
 
     private DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
         DdSword2Application.class,
         ResourceHelpers.resourceFilePath("test-etc/config-servicedocument.yml")
     );
+
+    @AfterEach
+    void tearDown() {
+        ((LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory()).stop();
+    }
 
     @Test
     void getServiceDocument() throws JAXBException {

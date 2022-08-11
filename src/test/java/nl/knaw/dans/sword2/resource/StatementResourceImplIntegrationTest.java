@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.resource;
 
+import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -41,7 +42,8 @@ import java.time.ZoneOffset;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-class StatementResourceImplTest {
+class StatementResourceImplIntegrationTest {
+
     private DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
         DdSword2Application.class,
         ResourceHelpers.resourceFilePath("test-etc/config-regular.yml")
@@ -56,6 +58,7 @@ class StatementResourceImplTest {
     @AfterEach
     void tearDown() throws IOException {
         FileUtils.deleteDirectory(Path.of("data/tmp").toFile());
+        ((LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory()).stop();
     }
 
     @Test
