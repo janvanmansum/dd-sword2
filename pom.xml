@@ -23,13 +23,13 @@
     <parent>
         <artifactId>dans-dropwizard-project</artifactId>
         <groupId>nl.knaw.dans.shared</groupId>
-        <version>7.4.0-SNAPSHOT</version>
+        <version>7.4.0</version>
     </parent>
     <groupId>nl.knaw.dans</groupId>
     <artifactId>dd-sword2</artifactId>
     <version>0.0.2-SNAPSHOT</version>
 
-    <name>Dd Sword2</name>
+    <name>DD Sword2</name>
     <url>https://github.com/DANS-KNAW/dd-sword2</url>
     <description>DANS SWORD2 Service</description>
     <inceptionYear>2022</inceptionYear>
