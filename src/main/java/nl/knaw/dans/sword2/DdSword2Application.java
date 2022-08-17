@@ -21,8 +21,6 @@ import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.forms.MultiPartBundle;
-import io.dropwizard.health.conf.HealthConfiguration;
-import io.dropwizard.health.core.HealthCheckBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import nl.knaw.dans.sword2.auth.Depositor;
@@ -69,13 +67,6 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
     @Override
     public void initialize(final Bootstrap<DdSword2Configuration> bootstrap) {
         bootstrap.addBundle(new MultiPartBundle());
-        bootstrap.addBundle(new HealthCheckBundle<>() {
-
-            @Override
-            protected HealthConfiguration getHealthConfiguration(final DdSword2Configuration configuration) {
-                return configuration.getHealthConfiguration();
-            }
-        });
     }
 
     @Override

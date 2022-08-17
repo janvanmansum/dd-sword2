@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.resource;
 
+import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -37,9 +38,12 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-public class CollectionResourceLimitedDiskSpaceIntegrationTest {
+class CollectionResourceLimitedDiskSpaceIntegrationTest {
 
-    private final DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(DdSword2Application.class, ResourceHelpers.resourceFilePath("test-etc/config-bigmargin.yml"));
+    private final DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
+        DdSword2Application.class,
+        ResourceHelpers.resourceFilePath("test-etc/config-bigmargin.yml")
+    );
 
     @BeforeEach
     void startUp() throws IOException {
@@ -49,6 +53,7 @@ public class CollectionResourceLimitedDiskSpaceIntegrationTest {
     @AfterEach
     void tearDown() throws IOException {
         FileUtils.deleteDirectory(Path.of("data/tmp").toFile());
+        ((LoggerContext)org.slf4j.LoggerFactory.getILoggerFactory()).stop();
     }
 
     @Test
@@ -70,7 +75,7 @@ public class CollectionResourceLimitedDiskSpaceIntegrationTest {
     Invocation.Builder buildRequest(String path) {
         var url = String.format("http://localhost:%s%s", EXT.getLocalPort(), path);
 
-        return EXT.client()
+        return RequestClientBuilder.buildClient()
             .target(url)
             .register(MultiPartFeature.class)
             .request()
