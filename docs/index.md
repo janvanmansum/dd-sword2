@@ -75,15 +75,36 @@ The [service document]{:target=_blank} is an XML document that lets the client d
 be [retrieved](https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#protocoloperations_retreivingservicedocument){:target=_blank} with a simple
 GET request:
 
-```text
+```bash
 curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument
 ```
 
 #### Creating and submitting a deposit
 
-A deposit is created by [posting a ZIP file]: with a _bag_ (see [BagIt]{:target=_blank}) to one of the collection end-points (see SWORD v2 Specs:
-[binary file deposit]{:target=_blank}). The bag must contain all data and metadata for the deposit. The type of metadata and where it is to be found in the bag
-is transparent to `dd-sword2`.
+A deposit is created by [binary file deposit]{:target=_blank}. The other options that SWORDv2 specifies are currently not supported. Furthermore, the only
+[packaging]{:target=_blank} that is supported is `http://purl.org/net/sword/package/BagIt`. This means that:
+
+* the payload of the upload must be a ZIP file with a [bag];
+* the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
+
+If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection` then it can be uploaded as follows:
+
+<!-- TODO: Content-MD5 mandatory ? -->
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/zip' \
+     -H "Content-MD5: $(md5 bag.zip)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
+```
+
+<!-- TODO: mention deposit receipt -->
+
+##### Continued deposit
+
+If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client should split the ZIP file into chunks
+
 
 #### Finalizing a deposit
 
@@ -155,6 +176,8 @@ Alternatively, to build the tarball execute:
 
 [BagIt]: https://datatracker.ietf.org/doc/html/rfc8493
 
+[bag]: https://datatracker.ietf.org/doc/html/rfc8493
+
 [deposit directory]: https://dans-knaw.github.io/dd-ingest-flow/deposit-directory/
 
 [easy-sword2-dans-examples]: https://github.com/DANS-KNAW/easy-sword2-dans-examples
@@ -172,3 +195,7 @@ Alternatively, to build the tarball execute:
 [HTTP]: https://www.rfc-editor.org/rfc/rfc2616.html
 
 [config.yml]: https://github.com/DANS-KNAW/dd-sword2/blob/master/src/main/assembly/dist/cfg/config.yml
+
+[packaging]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#packaging
+
+[continued deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#continueddeposit

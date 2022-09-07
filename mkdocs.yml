@@ -32,7 +32,8 @@ markdown_extensions:
   - attr_list
   - admonition
   - codehilite:
-      guess_lang: false
+      guess_lang: False
+      use_pygments: False
   - def_list
   - footnotes
   - meta
