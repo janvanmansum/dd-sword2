@@ -18,9 +18,15 @@ DESCRIPTION
 
 The `dd-sword2` service is the [DANS]{:target=_blank} implementation of the [SWORDv2]{:target=_blank} protocol. It is a rewrite in Java of the Scala-based
 project [easy-sword2]{:target=_blank}. As its predecessor, it does **not** implement the full SWORDv2 specifications. Also, since the SWORDv2 specs leave
-various important issues up to the implementer, the service adds some features. The best starting point for learning about `dd-sword2` is this document. Where
-appropriate it contains references to the SWORDv2 specifications document. Client programmers should consult the [easy-sword2-dans-examples]{:target=_blank}
-project.
+various important issues up to the implementer, the service adds some features.
+
+The best starting point for learning about `dd-sword2` is this document. Where appropriate, this document contains references to the
+[SWORDv2 specifications document]{:target=_blank}. When reading the SWORDv2 docs, keep in mind that it is itself built on other specifications, and refers to
+those often, especially:
+
+* [AtomPub]{:target=_blank}
+* [Atom]{:target=_blank}
+* [HTTP]{:target=_blank}
 
 #### Purpose of the service
 
@@ -54,9 +60,30 @@ The service has the following interfaces.
 
 ### Processing
 
+The following sections describe the interaction of a client with the SWORDv2 interface. The examples are `curl` commands. The meaning of the shell variables is
+as follows:
+
+| Variable           | Meaning                                                                                                                 |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `USER`             | user name of sword client                                                                                               |
+| `PASSWORD`         | password of the sword client                                                                                            |
+| `SWORD_BASE_URL`   | the base URL of the SWORD service <br/>(the same URL is configured in [config.yml]{:target=_blank} as `sword2.baseUrl`) |
+
+#### Getting the service document
+
+The [service document]{:target=_blank} is an XML document that lets the client discover the capabilities and the supported collections of the service. It can
+be [retrieved](https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#protocoloperations_retreivingservicedocument){:target=_blank} with a simple
+GET request:
+
+```text
+curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument
+```
+
 #### Creating and submitting a deposit
 
-TODO
+A deposit is created by [posting a ZIP file]: with a _bag_ (see [BagIt]{:target=_blank}) to one of the collection end-points (see SWORD v2 Specs:
+[binary file deposit]{:target=_blank}). The bag must contain all data and metadata for the deposit. The type of metadata and where it is to be found in the bag
+is transparent to `dd-sword2`.
 
 #### Finalizing a deposit
 
@@ -97,9 +124,7 @@ For installation on systems that do no support RPM and/or systemd:
 
 CONFIGURATION
 -------------
-This service can be configured by changing the settings
-in [`config.yml`](https://github.com/DANS-KNAW/dd-sword2/blob/master/src/main/assembly/dist/cfg/config.yml){:target=_blank}. See the comments in that file for
-more information.
+This service can be configured by changing the settings in [config.yml]{:target=_blank}. See the comments in that file for more information.
 
 BUILDING FROM SOURCE
 --------------------
@@ -133,3 +158,17 @@ Alternatively, to build the tarball execute:
 [deposit directory]: https://dans-knaw.github.io/dd-ingest-flow/deposit-directory/
 
 [easy-sword2-dans-examples]: https://github.com/DANS-KNAW/easy-sword2-dans-examples
+
+[SWORDv2 specifications document]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html
+
+[binary file deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#protocoloperations_creatingresource_binary
+
+[service document]: https://www.ietf.org/rfc/rfc5023.html#section-8
+
+[AtomPub]: https://www.ietf.org/rfc/rfc5023.html
+
+[Atom]: https://www.ietf.org/rfc/rfc4287.html
+
+[HTTP]: https://www.rfc-editor.org/rfc/rfc2616.html
+
+[config.yml]: https://github.com/DANS-KNAW/dd-sword2/blob/master/src/main/assembly/dist/cfg/config.yml
