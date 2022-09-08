@@ -3,7 +3,6 @@ dd-sword2
 
 DANS SWORD v2 based deposit service
 
-
 SYNOPSIS
 --------
 
@@ -87,24 +86,28 @@ A deposit is created by [binary file deposit]{:target=_blank}. The other options
 * the payload of the upload must be a ZIP file with a [bag];
 * the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
 
-If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection` then it can be uploaded as follows:
+It is furthermore **mandatory** to send along the `Content-MD5` header. Note that SWORD2 requires the content of this header to be a **hex encoded** MD5 digest,
+rather than the base64 encoded MD5 digest specified in [RFC1864](https://www.rfc-editor.org/rfc/rfc1864.html) about Content-MD5.
 
-<!-- TODO: Content-MD5 mandatory ? -->
+If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection`, then it can be uploaded as follows:
 
 ```bash
 curl -X POST \
      -H 'Content-Type: application/zip' \
-     -H "Content-MD5: $(md5 bag.zip)" \ 
+     -H "Content-MD5: $(md5 -q bag.zip)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
      --data @bag.zip -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
 ```
 
-<!-- TODO: mention deposit receipt -->
+(The `md5` command used above is the one from BSD and MacOS. You may have to get the correct output in a different way on other systems.)
+
+If the upload is successful the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
+statement URL (Stat-IRI), which is the URL the client can use to [track post-submision processing](#tracking-post-submission-processing).
 
 ##### Continued deposit
 
-If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client should split the ZIP file into chunks
-
+If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client should split the ZIP file into chunks and
+send these in separate requests with the `In-Progress` header set to `true` (except for the last chunk).
 
 #### Finalizing a deposit
 
@@ -199,3 +202,5 @@ Alternatively, to build the tarball execute:
 [packaging]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#packaging
 
 [continued deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#continueddeposit
+
+[deposit receipt]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#depositreceipt
