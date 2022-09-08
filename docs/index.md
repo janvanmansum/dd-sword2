@@ -104,10 +104,32 @@ curl -X POST \
 If the upload is successful the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
 statement URL (Stat-IRI), which is the URL the client can use to [track post-submision processing](#tracking-post-submission-processing).
 
-##### Continued deposit
+#### Continued deposit
 
 If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client should split the ZIP file into chunks and
-send these in separate requests with the `In-Progress` header set to `true` (except for the last chunk).
+send these in separate requests with the `In-Progress` header set to `true` (except for the last chunk). The names of the chunk files must be: the name of the
+complete ZIP file, extended with `.n`, where n is the sequence number.
+
+The first chunk is sent to the collection URL ([Col-IRI]{:target=_blank} in SWORD2 terms), the subsequent chunks are sent to the SWORD "edit" URL 
+([SE-IRI]{:target=_blank}), which can be found in the deposit receipt of the first upload.
+
+The client indicates that it will be sending more chunks by including the header `In-Progress: true`. Since the content of each separate chunk is not a valid 
+ZIP file, the `Content-Type` must be set to `application/octet-stream`.
+
+If `bag.zip.1`, `bag.zip.2` and `bag.zip.3` are the chunks created by splitting `bag.zip`, they can be uploaded as follows:
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: true' \
+     -H "Content-MD5: $(md5 -q bag.zip.1)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.1 -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
+```
+
+The client then 
+
+
 
 #### Finalizing a deposit
 
@@ -204,3 +226,7 @@ Alternatively, to build the tarball execute:
 [continued deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#continueddeposit
 
 [deposit receipt]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#depositreceipt
+
+[Col-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[SE-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
