@@ -16,7 +16,7 @@ DESCRIPTION
 #### Context
 
 The `dd-sword2` service is the [DANS]{:target=_blank} implementation of the [SWORDv2]{:target=_blank} protocol. It is a rewrite in Java of the Scala-based
-project [easy-sword2]{:target=_blank}. As its predecessor, it does **not** implement the full SWORDv2 specifications. Also, since the SWORDv2 specs leave
+project [easy-sword2]{:target=_blank}. Like its predecessor, it does **not** implement the full SWORDv2 specifications. Also, since the SWORDv2 specs leave
 various important issues up to the implementer, the service adds some features.
 
 The best starting point for learning about `dd-sword2` is this document. Where appropriate, this document contains references to the
@@ -49,7 +49,7 @@ The service has the following interfaces.
 * _Protocol type_: Shared filesystem
 * _Internal or external_: **internal**
 * _Purpose_: handing packages to the post-submission processing service and reporting back status changes written by that service to the `deposit.properties`
-  files of the deposit directories.
+  files of the deposit directories
 
 #### Admin console
 
@@ -59,7 +59,7 @@ The service has the following interfaces.
 
 ### Processing
 
-The following sections describe the interaction of a client with the SWORDv2 interface. The examples are `curl` commands. The meaning of the shell variables is
+The following sections describe the interaction of a client with the SWORDv2 interface. The examples are [curl]{:target=_blank} commands. The meaning of the shell variables is
 as follows:
 
 | Variable           | Meaning                                                                                                                 |
@@ -83,11 +83,11 @@ curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument
 A deposit is created by [binary file deposit]{:target=_blank}. The other options that SWORDv2 specifies are currently not supported. Furthermore, the only
 [packaging]{:target=_blank} that is supported is `http://purl.org/net/sword/package/BagIt`. This means that:
 
-* the payload of the upload must be a ZIP file with a [bag];
+* the payload of the upload must be a ZIP file containing a [bag]{:target=_blank};
 * the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
 
 It is furthermore **mandatory** to send along the `Content-MD5` header. Note that SWORD2 requires the content of this header to be a **hex encoded** MD5 digest,
-rather than the base64 encoded MD5 digest specified in [RFC1864](https://www.rfc-editor.org/rfc/rfc1864.html) about Content-MD5.
+rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.
 
 If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection`, then it can be uploaded as follows:
 
@@ -106,17 +106,19 @@ statement URL (Stat-IRI), which is the URL the client can use to [track post-sub
 
 #### Continued deposit
 
-If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client should split the ZIP file into chunks and
-send these in separate requests with the `In-Progress` header set to `true` (except for the last chunk). The names of the chunk files must be: the name of the
+If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client must split the ZIP file into chunks and
+send these in separate requests with the `In-Progress` header set to `true` for all chunks except the last. The names of the chunk files must be: the name of the
 complete ZIP file, extended with `.n`, where n is the sequence number.
 
-The first chunk is sent to the collection URL ([Col-IRI]{:target=_blank} in SWORD2 terms), the subsequent chunks are sent to the SWORD "edit" URL 
+**(1)** The first chunk is sent to the collection URL ([Col-IRI]{:target=_blank} in SWORD terms), **(2)** the subsequent chunks are sent to the SWORD "edit" URL 
 ([SE-IRI]{:target=_blank}), which can be found in the deposit receipt of the first upload.
 
 The client indicates that it will be sending more chunks by including the header `In-Progress: true`. Since the content of each separate chunk is not a valid 
-ZIP file, the `Content-Type` must be set to `application/octet-stream`.
+ZIP file, the `Content-Type` must be set to `application/octet-stream` (which is a fancy way of saying the content consists of bytes).
 
 If `bag.zip.1`, `bag.zip.2` and `bag.zip.3` are the chunks created by splitting `bag.zip`, they can be uploaded as follows:
+
+**Step (1)**
 
 ```bash
 curl -X POST \
@@ -127,7 +129,13 @@ curl -X POST \
      --data @bag.zip.1 -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
 ```
 
-The client then 
+
+
+
+
+**Step (2)**
+
+Parts 2 and 3 sent to the 
 
 
 
@@ -230,3 +238,7 @@ Alternatively, to build the tarball execute:
 [Col-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
 
 [SE-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[curl]: https://www.man7.org/linux/man-pages/man1/curl.1.html
+
+[RFC1864]: https://www.rfc-editor.org/rfc/rfc1864.html

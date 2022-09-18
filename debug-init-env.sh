@@ -15,7 +15,15 @@
 # limitations under the License.
 #
 
-echo -n "Pre-creating log..."
 TEMPDIR=data
+
+echo -n "Creating test directories..."
+mkdir -p data/tmp/1/uploads
+mkdir -p data/tmp/1/deposits
+mkdir -p data/tmp/2/uploads
+mkdir -p data/tmp/2/deposits
+echo "OK"
+
+echo -n "Pre-creating log..."
 touch $TEMPDIR/dd-sword2.log
 echo "OK"
