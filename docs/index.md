@@ -67,6 +67,8 @@ as follows:
 | `USER`             | user name of sword client                                                                                               |
 | `PASSWORD`         | password of the sword client                                                                                            |
 | `SWORD_BASE_URL`   | the base URL of the SWORD service <br/>(the same URL is configured in [config.yml]{:target=_blank} as `sword2.baseUrl`) |
+| `SWORD_COL_IRI`    | the URL of the collection the the deposit is sent to                                                                    |
+| `SWORD_EDIT_IRI`   | the URL to send subsequent parts to in a continued deposit                                                              | 
 
 #### Getting the service document
 
@@ -126,26 +128,103 @@ curl -X POST \
      -H 'In-Progress: true' \
      -H "Content-MD5: $(md5 -q bag.zip.1)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data @bag.zip.1 -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
+     --data @bag.zip.1 -u $USER:$PASSWORD $SWORD_COL_IRI
 ```
 
+If the upload is successful the server will respond with a download receipt:
 
-
-
+```xml
+<entry xmlns="http://www.w3.org/2005/Atom">
+    <generator uri="http://www.swordapp.org/" version="2.0" />
+    <id>https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
+    <link href="https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="edit" />
+    <link href="https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="http://purl.org/net/sword/terms/add" />
+    <link href="https://swordserver.org/sword2/media/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="edit-media" />
+    <packaging xmlns="http://purl.org/net/sword/terms/">http://purl.org/net/sword/package/BagIt</packaging>
+    <link href="https://swordserver.org/sword2/statement/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml; type=feed" />
+    <treatment xmlns="http://purl.org/net/sword/terms/">[1] unpacking [2] verifying integrity [3] storing persistently</treatment>
+    <verboseDescription xmlns="http://purl.org/net/sword/terms/">received successfully: bag.zip.1; MD5: 494dd614e36edf5c929403ed7625b157</verboseDescription>
+</entry>
+```
 
 **Step (2)**
 
-Parts 2 and 3 sent to the 
+Parts 2 and 3 sent to the SWORD "edit" URL ([SE-IRI]{:target=_blank}). It can be retrieved from the deposit receipt by finding the link element with `rel="edit"`.
+In the example this is `https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4`. 
 
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: true' \
+     -H "Content-MD5: $(md5 -q bag.zip.2)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+```
 
+For the last part the `In-Progress` header is set to false.
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: false' \
+     -H "Content-MD5: $(md5 -q bag.zip.3)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+```
+
+After this, the client will have to wait for the server to process the deposit. It should [track the progress](#tracking-post-submission-processing) until the 
+the server has confirmed that the deposit was fully processed.
 
 #### Finalizing a deposit
 
-TODO
+When the client signals that is is done uploading a deposit, `dd-sword2` will try to create a deposit directory with a valid bag from it. If that succeeds, the
+state of the deposit becomes `SUBMITTED`.  If the uploaded bag is **not** valid according to the [BagIt]{:target=_blank} specs, the state becomes `INVALID`. If
+some server error occurs the state becomes `FAILED`.
+
+As long as the client is uploading parts of the deposit the state is `DRAFT`. When the last part has been received, the state becomes `UPLOADED`. An "uploaded"
+deposit is waiting for finalization. When a finalization worker becomes available it will:
+
+1. change the state of the deposit to `FINALIZING`;
+2. concatenate the parts uploaded in a continued deposit into one file (in a simple deposit this is skipped, of course);
+3. unzip the file;
+4. validate that resulting directory complies with the [BagIt]{:target=_blank} specs;
+5. change the state to `SUBMITTED`;
+6. update the `deposit.properties` file and move the deposit to the deposits directory configured for the collection.
+
+After this `dd-sword2` will **not write to the deposit in any way**. In other words, by moving the deposit tot he deposits directory `dd-sword2` hands over 
+further processing to a post-submission process. The only thing that `dd-sword2` will continue to do is to serve the client the SWORD Statement whenever 
+requested. This ensures the client can keep track of the deposit even after `dd-sword2` is finished with it.
 
 #### Tracking post-submission processing
 
-TODO
+As soon as the deposit exists, the client can track its state by downloading the SWORD statement from the Statement URL ([Stat-IRI]{:target=_blank}). This URL
+can be found in the deposit receipt in the link with the attribute `rel="http://purl.org/net/sword/terms/statement"`.
+
+A SWORD Statement is an Atom Feed document, for example:
+
+```xml
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>$SWORD_STAT_IRI</id>
+    <link href="$SWORD_STAT_IRI" rel="self" />
+    <title type="text">Deposit a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
+    <author>
+        <name>user</name>
+    </author>
+    <updated>2019-05-23T14:51:15.356Z</updated>
+    <category term="ARCHIVED" scheme="http://purl.org/net/sword/terms/state" label="State" />
+    <entry>
+        <content type="multipart/related" src="urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4" />
+        <id>urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
+        <title type="text">Resource urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
+        <summary type="text">Resource Part</summary>
+        <updated>2019-05-23T14:51:22.342Z</updated>
+        <link href="https://doi.org/10.5072/dans-Lwgy-zrn-jfyy" rel="self" />
+    </entry>
+</feed>
+```
+
+<!-- TODO REVIEW WHAT SHOULD BE IN THE STATEMENT -->
+
 
 ARGUMENTS
 ---------
@@ -238,6 +317,8 @@ Alternatively, to build the tarball execute:
 [Col-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
 
 [SE-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[Stat-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
 
 [curl]: https://www.man7.org/linux/man-pages/man1/curl.1.html
 
