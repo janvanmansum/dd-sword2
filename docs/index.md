@@ -3,7 +3,6 @@ dd-sword2
 
 DANS SWORD v2 based deposit service
 
-
 SYNOPSIS
 --------
 
@@ -17,10 +16,16 @@ DESCRIPTION
 #### Context
 
 The `dd-sword2` service is the [DANS]{:target=_blank} implementation of the [SWORDv2]{:target=_blank} protocol. It is a rewrite in Java of the Scala-based
-project [easy-sword2]{:target=_blank}. As its predecessor, it does **not** implement the full SWORDv2 specifications. Also, since the SWORDv2 specs leave
-various important issues up to the implementer, the service adds some features. The best starting point for learning about `dd-sword2` is this document. Where
-appropriate it contains references to the SWORDv2 specifications document. Client programmers should consult the [easy-sword2-dans-examples]{:target=_blank}
-project.
+project [easy-sword2]{:target=_blank}. Like its predecessor, it does **not** implement the full SWORDv2 specifications. Also, since the SWORDv2 specs leave
+various important issues up to the implementer, the service adds some features.
+
+The best starting point for learning about `dd-sword2` is this document. Where appropriate, this document contains references to the
+[SWORDv2 specifications document]{:target=_blank}. When reading the SWORDv2 docs, keep in mind that it is itself built on other specifications, and refers to
+those often, especially:
+
+* [AtomPub]{:target=_blank}
+* [Atom]{:target=_blank}
+* [HTTP]{:target=_blank}
 
 #### Purpose of the service
 
@@ -44,7 +49,7 @@ The service has the following interfaces.
 * _Protocol type_: Shared filesystem
 * _Internal or external_: **internal**
 * _Purpose_: handing packages to the post-submission processing service and reporting back status changes written by that service to the `deposit.properties`
-  files of the deposit directories.
+  files of the deposit directories
 
 #### Admin console
 
@@ -54,17 +59,172 @@ The service has the following interfaces.
 
 ### Processing
 
+The following sections describe the interaction of a client with the SWORDv2 interface. The examples are [curl]{:target=_blank} commands. The meaning of the shell variables is
+as follows:
+
+| Variable           | Meaning                                                                                                                 |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `USER`             | user name of sword client                                                                                               |
+| `PASSWORD`         | password of the sword client                                                                                            |
+| `SWORD_BASE_URL`   | the base URL of the SWORD service <br/>(the same URL is configured in [config.yml]{:target=_blank} as `sword2.baseUrl`) |
+| `SWORD_COL_IRI`    | the URL of the collection the the deposit is sent to                                                                    |
+| `SWORD_EDIT_IRI`   | the URL to send subsequent parts to in a continued deposit                                                              | 
+
+#### Getting the service document
+
+The [service document]{:target=_blank} is an XML document that lets the client discover the capabilities and the supported collections of the service. It can
+be [retrieved](https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#protocoloperations_retreivingservicedocument){:target=_blank} with a simple
+GET request:
+
+```bash
+curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument
+```
+
 #### Creating and submitting a deposit
 
-TODO
+A deposit is created by [binary file deposit]{:target=_blank}. The other options that SWORDv2 specifies are currently not supported. Furthermore, the only
+[packaging]{:target=_blank} that is supported is `http://purl.org/net/sword/package/BagIt`. This means that:
+
+* the payload of the upload must be a ZIP file containing a [bag]{:target=_blank};
+* the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
+
+It is furthermore **mandatory** to send along the `Content-MD5` header. Note that SWORD2 requires the content of this header to be a **hex encoded** MD5 digest,
+rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.
+
+If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection`, then it can be uploaded as follows:
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/zip' \
+     -H "Content-MD5: $(md5 -q bag.zip)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
+```
+
+(The `md5` command used above is the one from BSD and MacOS. You may have to get the correct output in a different way on other systems.)
+
+If the upload is successful the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
+statement URL (Stat-IRI), which is the URL the client can use to [track post-submision processing](#tracking-post-submission-processing).
+
+#### Continued deposit
+
+If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client must split the ZIP file into chunks and
+send these in separate requests with the `In-Progress` header set to `true` for all chunks except the last. The names of the chunk files must be: the name of the
+complete ZIP file, extended with `.n`, where n is the sequence number.
+
+**(1)** The first chunk is sent to the collection URL ([Col-IRI]{:target=_blank} in SWORD terms), **(2)** the subsequent chunks are sent to the SWORD "edit" URL 
+([SE-IRI]{:target=_blank}), which can be found in the deposit receipt of the first upload.
+
+The client indicates that it will be sending more chunks by including the header `In-Progress: true`. Since the content of each separate chunk is not a valid 
+ZIP file, the `Content-Type` must be set to `application/octet-stream` (which is a fancy way of saying the content consists of bytes).
+
+If `bag.zip.1`, `bag.zip.2` and `bag.zip.3` are the chunks created by splitting `bag.zip`, they can be uploaded as follows:
+
+**Step (1)**
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: true' \
+     -H "Content-MD5: $(md5 -q bag.zip.1)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.1 -u $USER:$PASSWORD $SWORD_COL_IRI
+```
+
+If the upload is successful the server will respond with a download receipt:
+
+```xml
+<entry xmlns="http://www.w3.org/2005/Atom">
+    <generator uri="http://www.swordapp.org/" version="2.0" />
+    <id>https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
+    <link href="https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="edit" />
+    <link href="https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="http://purl.org/net/sword/terms/add" />
+    <link href="https://swordserver.org/sword2/media/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="edit-media" />
+    <packaging xmlns="http://purl.org/net/sword/terms/">http://purl.org/net/sword/package/BagIt</packaging>
+    <link href="https://swordserver.org/sword2/statement/a5bb644a-78a3-47ae-907a-0bdf162a0cd4" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml; type=feed" />
+    <treatment xmlns="http://purl.org/net/sword/terms/">[1] unpacking [2] verifying integrity [3] storing persistently</treatment>
+    <verboseDescription xmlns="http://purl.org/net/sword/terms/">received successfully: bag.zip.1; MD5: 494dd614e36edf5c929403ed7625b157</verboseDescription>
+</entry>
+```
+
+**Step (2)**
+
+Parts 2 and 3 sent to the SWORD "edit" URL ([SE-IRI]{:target=_blank}). It can be retrieved from the deposit receipt by finding the link element with `rel="edit"`.
+In the example this is `https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4`. 
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: true' \
+     -H "Content-MD5: $(md5 -q bag.zip.2)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+```
+
+For the last part the `In-Progress` header is set to false.
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/octet-stream' \
+     -H 'In-Progress: false' \
+     -H "Content-MD5: $(md5 -q bag.zip.3)" \ 
+     -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
+     --data @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+```
+
+After this, the client will have to wait for the server to process the deposit. It should [track the progress](#tracking-post-submission-processing) until the 
+the server has confirmed that the deposit was fully processed.
 
 #### Finalizing a deposit
 
-TODO
+When the client signals that is is done uploading a deposit, `dd-sword2` will try to create a deposit directory with a valid bag from it. If that succeeds, the
+state of the deposit becomes `SUBMITTED`.  If the uploaded bag is **not** valid according to the [BagIt]{:target=_blank} specs, the state becomes `INVALID`. If
+some server error occurs the state becomes `FAILED`.
+
+As long as the client is uploading parts of the deposit the state is `DRAFT`. When the last part has been received, the state becomes `UPLOADED`. An "uploaded"
+deposit is waiting for finalization. When a finalization worker becomes available it will:
+
+1. change the state of the deposit to `FINALIZING`;
+2. concatenate the parts uploaded in a continued deposit into one file (in a simple deposit this is skipped, of course);
+3. unzip the file;
+4. validate that resulting directory complies with the [BagIt]{:target=_blank} specs;
+5. change the state to `SUBMITTED`;
+6. update the `deposit.properties` file and move the deposit to the deposits directory configured for the collection.
+
+After this `dd-sword2` will **not write to the deposit in any way**. In other words, by moving the deposit tot he deposits directory `dd-sword2` hands over 
+further processing to a post-submission process. The only thing that `dd-sword2` will continue to do is to serve the client the SWORD Statement whenever 
+requested. This ensures the client can keep track of the deposit even after `dd-sword2` is finished with it.
 
 #### Tracking post-submission processing
 
-TODO
+As soon as the deposit exists, the client can track its state by downloading the SWORD statement from the Statement URL ([Stat-IRI]{:target=_blank}). This URL
+can be found in the deposit receipt in the link with the attribute `rel="http://purl.org/net/sword/terms/statement"`.
+
+A SWORD Statement is an Atom Feed document, for example:
+
+```xml
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>$SWORD_STAT_IRI</id>
+    <link href="$SWORD_STAT_IRI" rel="self" />
+    <title type="text">Deposit a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
+    <author>
+        <name>user</name>
+    </author>
+    <updated>2019-05-23T14:51:15.356Z</updated>
+    <category term="ARCHIVED" scheme="http://purl.org/net/sword/terms/state" label="State" />
+    <entry>
+        <content type="multipart/related" src="urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4" />
+        <id>urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
+        <title type="text">Resource urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
+        <summary type="text">Resource Part</summary>
+        <updated>2019-05-23T14:51:22.342Z</updated>
+        <link href="https://doi.org/10.5072/dans-Lwgy-zrn-jfyy" rel="self" />
+    </entry>
+</feed>
+```
+
+<!-- TODO REVIEW WHAT SHOULD BE IN THE STATEMENT -->
+
 
 ARGUMENTS
 ---------
@@ -97,9 +257,7 @@ For installation on systems that do no support RPM and/or systemd:
 
 CONFIGURATION
 -------------
-This service can be configured by changing the settings
-in [`config.yml`](https://github.com/DANS-KNAW/dd-sword2/blob/master/src/main/assembly/dist/cfg/config.yml){:target=_blank}. See the comments in that file for
-more information.
+This service can be configured by changing the settings in [config.yml]{:target=_blank}. See the comments in that file for more information.
 
 BUILDING FROM SOURCE
 --------------------
@@ -130,6 +288,38 @@ Alternatively, to build the tarball execute:
 
 [BagIt]: https://datatracker.ietf.org/doc/html/rfc8493
 
+[bag]: https://datatracker.ietf.org/doc/html/rfc8493
+
 [deposit directory]: https://dans-knaw.github.io/dd-ingest-flow/deposit-directory/
 
 [easy-sword2-dans-examples]: https://github.com/DANS-KNAW/easy-sword2-dans-examples
+
+[SWORDv2 specifications document]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html
+
+[binary file deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#protocoloperations_creatingresource_binary
+
+[service document]: https://www.ietf.org/rfc/rfc5023.html#section-8
+
+[AtomPub]: https://www.ietf.org/rfc/rfc5023.html
+
+[Atom]: https://www.ietf.org/rfc/rfc4287.html
+
+[HTTP]: https://www.rfc-editor.org/rfc/rfc2616.html
+
+[config.yml]: https://github.com/DANS-KNAW/dd-sword2/blob/master/src/main/assembly/dist/cfg/config.yml
+
+[packaging]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#packaging
+
+[continued deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#continueddeposit
+
+[deposit receipt]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#depositreceipt
+
+[Col-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[SE-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[Stat-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
+
+[curl]: https://www.man7.org/linux/man-pages/man1/curl.1.html
+
+[RFC1864]: https://www.rfc-editor.org/rfc/rfc1864.html
