@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CollectionConfig {
@@ -38,6 +39,8 @@ public class CollectionConfig {
     @NotNull
     @JsonDeserialize(converter = StringByteSizeConverter.class)
     private long diskSpaceMargin;
+    private List<Path> depositTrackingPath = new ArrayList<>();
+    private List<DepositState> autoClean = new ArrayList<>();
 
     public CollectionConfig() {
 
@@ -52,7 +55,13 @@ public class CollectionConfig {
         this.autoClean = autoClean;
     }
 
-    private List<DepositState> autoClean;
+    public List<Path> getDepositTrackingPath() {
+        return depositTrackingPath;
+    }
+
+    public void setDepositTrackingPath(List<Path> depositTrackingPath) {
+        this.depositTrackingPath = depositTrackingPath;
+    }
 
     public long getDiskSpaceMargin() {
         return diskSpaceMargin;
@@ -109,6 +118,8 @@ public class CollectionConfig {
             ", path='" + path + '\'' +
             ", uploads=" + uploads +
             ", deposits=" + deposits +
+            ", diskSpaceMargin=" + diskSpaceMargin +
+            ", depositTrackingPath=" + depositTrackingPath +
             ", autoClean=" + autoClean +
             '}';
     }

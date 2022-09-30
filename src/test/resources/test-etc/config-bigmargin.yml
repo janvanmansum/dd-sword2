@@ -5,11 +5,11 @@ server:
   applicationConnectors:
     - type: http
       # Replace with port number unique for this service
-      port: 20000
+      port: 0
   adminConnectors:
     - type: http
       # Replace with port number unique for this service
-      port: 20001
+      port: 0
   requestLog:
     appenders: []
 
@@ -28,6 +28,8 @@ sword2:
       path: '1'
       uploads: data/tmp/1/uploads
       deposits: data/tmp/1/deposits
+      depositTrackingPath:
+        - data/tmp/1/outbox/failed
       autoClean:
         - REJECTED
       diskSpaceMargin: 200000G
