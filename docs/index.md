@@ -67,7 +67,7 @@ as follows:
 | `USER`             | user name of sword client                                                                                               |
 | `PASSWORD`         | password of the sword client                                                                                            |
 | `SWORD_BASE_URL`   | the base URL of the SWORD service <br/>(the same URL is configured in [config.yml]{:target=_blank} as `sword2.baseUrl`) |
-| `SWORD_COL_IRI`    | the URL of the collection the the deposit is sent to                                                                    |
+| `SWORD_COL_IRI`    | the URL of the collection that the deposit is sent to                                                                   |
 | `SWORD_EDIT_IRI`   | the URL to send subsequent parts to in a continued deposit                                                              | 
 
 #### Getting the service document
@@ -88,22 +88,22 @@ A deposit is created by [binary file deposit]{:target=_blank}. The other options
 * the payload of the upload must be a ZIP file containing a [bag]{:target=_blank};
 * the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
 
-It is furthermore **mandatory** to send along the `Content-MD5` header. Note that SWORD2 requires the content of this header to be a **hex encoded** MD5 digest,
-rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.
+It is furthermore **mandatory** to send along the `Content-MD5` header. (Note that SWORD2 requires the content of this header to be a **hex encoded** MD5 digest,
+rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.)
 
-If `bag.zip` is such a ZIP file, and there is a collection at path `collections/mycollection`, then it can be uploaded as follows:
+If `bag.zip` is such a ZIP file, then it can be uploaded as follows:
 
 ```bash
 curl -X POST \
      -H 'Content-Type: application/zip' \
      -H "Content-MD5: $(md5 -q bag.zip)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data @bag.zip -u $USER:$PASSWORD $SWORD_BASE_URL/collections/mycollection
+     --data @bag.zip -u $USER:$PASSWORD $SWORD_COL_IRI
 ```
 
 (The `md5` command used above is the one from BSD and MacOS. You may have to get the correct output in a different way on other systems.)
 
-If the upload is successful the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
+If the upload is successful, the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
 statement URL (Stat-IRI), which is the URL the client can use to [track post-submision processing](#tracking-post-submission-processing).
 
 #### Continued deposit
@@ -290,7 +290,7 @@ Alternatively, to build the tarball execute:
 
 [bag]: https://datatracker.ietf.org/doc/html/rfc8493
 
-[deposit directory]: https://dans-knaw.github.io/dd-ingest-flow/deposit-directory/
+[deposit directory]: https://dans-knaw.github.io/dans-datastation-architecture/deposit-directory/
 
 [easy-sword2-dans-examples]: https://github.com/DANS-KNAW/easy-sword2-dans-examples
 
