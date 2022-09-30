@@ -124,4 +124,33 @@ class StatementResourceImplIntegrationTest {
         var feed = response.readEntity(Feed.class);
         assertEquals(DepositState.INVALID.toString(), feed.getCategory().getTerm());
     }
+
+    @Test
+    void testStatementInOutbox() throws InvalidDepositException {
+        var deposit = new Deposit();
+        deposit.setId("a03ca6f1-608b-4247-8c22-99681b8494a0");
+        deposit.setCreated(OffsetDateTime.of(2022, 5, 1, 1, 2, 3, 4, ZoneOffset.UTC));
+        deposit.setState(DepositState.SUBMITTED);
+        deposit.setStateDescription("Submitted");
+        deposit.setDepositor("user001");
+
+        new DepositPropertiesManagerImpl().saveProperties(Path.of("data/tmp/1/outbox/3/a03ca6f1-608b-4247-8c22-99681b8494a0"), deposit);
+
+        var url = String.format("http://localhost:%s/statement/a03ca6f1-608b-4247-8c22-99681b8494a0", EXT.getLocalPort());
+        var response = EXT.client()
+            .target(url)
+            .request()
+            .header("Authorization", "Basic dXNlcjAwMTp1c2VyMDAx")
+            .get();
+
+        assertEquals(200, response.getStatus());
+
+        var feed = response.readEntity(Feed.class);
+
+        assertEquals("http://localhost:20320/statement/a03ca6f1-608b-4247-8c22-99681b8494a0", feed.getId());
+        assertEquals("SUBMITTED", feed.getCategory().getTerm());
+
+        var hash = response.getHeaderString("content-md5");
+        assertEquals("30d203e2d0c5e349921a8317f66b759b", hash);
+    }
 }

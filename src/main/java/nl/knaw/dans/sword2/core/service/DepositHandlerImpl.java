@@ -16,9 +16,9 @@
 package nl.knaw.dans.sword2.core.service;
 
 import nl.knaw.dans.sword2.auth.Depositor;
-import nl.knaw.dans.sword2.core.config.CollectionConfig;
 import nl.knaw.dans.sword2.core.Deposit;
 import nl.knaw.dans.sword2.core.DepositState;
+import nl.knaw.dans.sword2.core.config.CollectionConfig;
 import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositReadOnlyException;
@@ -180,9 +180,10 @@ public class DepositHandlerImpl implements DepositHandler {
             var basePaths = new ArrayList<Path>();
             basePaths.add(collection.getUploads());
             basePaths.add(collection.getDeposits());
-            basePaths.add(collection.getDeposits().resolve("processed"));
-            basePaths.add(collection.getDeposits().resolve("rejected"));
-            basePaths.add(collection.getDeposits().resolve("failed"));
+
+            if (collection.getDepositTrackingPath() != null) {
+                basePaths.addAll(collection.getDepositTrackingPath());
+            }
 
             for (var path : basePaths) {
                 var depositPath = path.resolve(depositId);
@@ -331,16 +332,18 @@ public class DepositHandlerImpl implements DepositHandler {
 
             var directories = fileService.listDirectories(deposit.getPath());
 
-            for (var directory: directories) {
+            for (var directory : directories) {
                 log.debug("Deleting directory {} because of state {}", directory, state);
 
                 try {
                     fileService.deleteDirectory(directory);
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     log.error("Unable to delete directory {}", directory, e);
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             log.error("Unable to clean path {} because of IOException", deposit.getPath(), e);
         }
     }
