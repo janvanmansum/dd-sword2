@@ -3,11 +3,9 @@ server:
   adminContextPath: /
   applicationConnectors:
     - type: http
-      # Replace with port number unique for this service
       port: 20320
   adminConnectors:
     - type: http
-      # Replace with port number unique for this service
       port: 20321
 
 users:
@@ -67,7 +65,7 @@ logging:
       logFormat: "%-5p [%d{ISO8601}] [%t] %c: %m%n%rEx"
     - type: file
       archive: false
-      currentLogFilename: data/tmp/dd-sword2.log
+      currentLogFilename: data/dd-sword2.log
 
 health:
   delayedShutdownHandlerEnabled: false

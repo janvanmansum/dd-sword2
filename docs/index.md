@@ -183,20 +183,20 @@ the server has confirmed that the deposit was fully processed.
 
 #### Finalizing a deposit
 
-When the client signals that it is done uploading a deposit, `dd-sword2` will try to create a deposit directory with a valid bag from it. If that succeeds, the
-state of the deposit becomes `SUBMITTED`. If the uploaded bag is **not** valid according to the [BagIt]{:target=_blank} specs, the state becomes `INVALID`. If
-some server error occurs the state becomes `FAILED`.
-
-As long as the client is uploading parts of the deposit the state is `DRAFT`. When the last part has been received, the state becomes `UPLOADED`. An "uploaded"
-deposit is waiting for finalization. When a finalization worker becomes available it will:
+When the client sends (the first part of) a bag, the server creates a draft [deposit directory]{:target=_blank}. As long as the client is uploading parts of the
+deposit, the state of the deposit directory is `DRAFT`. When the last part has been received, the state becomes `UPLOADED`. An "uploaded" deposit is waiting for
+finalization. When a finalization worker becomes available it will:
 
 1. change the state of the deposit to `FINALIZING`;
 2. concatenate the parts uploaded in a continued deposit into one file in the order indicated by the sequences numbers at the endings of the file names (in a
    simple deposit this is skipped, of course);
-3. unzip the file;
-4. validate that resulting directory complies with the [BagIt]{:target=_blank} specs;
+3. unzip the file (if this fails, the deposit becomes `INVALID`);
+4. validate that resulting directory complies with the [BagIt]{:target=_blank} specs (if this fails, the deposit becomes `INVALID`);
 5. change the state to `SUBMITTED`;
-6. update the `deposit.properties` file and move the deposit to the deposits directory configured for the collection.
+6. move the deposit to the directory configured for the collection in `sword2.collections.<collection>.deposits`. (See [config.yml]{:target=_blank}.)
+
+(Any error **other** than the upload not being a valid ZIP file or not being a valid bag, will cause the deposit to transition to a `FAILED` state. In other
+words,`INVALID` indicates faulty input by the client, `FAILED` means that the server was misconfigured or was experiencing other problems.)
 
 After this `dd-sword2`, will **not write to the deposit in any way**. In other words, by moving the deposit tot he deposits directory `dd-sword2` hands over
 further processing to a post-submission process. The only thing that `dd-sword2` will continue to do is to serve the client the SWORD Statement whenever
@@ -204,10 +204,10 @@ requested. This ensures the client can keep track of the deposit even after `dd-
 
 #### Tracking post-submission processing
 
-As soon as the deposit exists, the client can track its state by downloading the SWORD statement from the Statement URL ([Stat-IRI]{:target=_blank}). This URL
-can be found in the deposit receipt in the link with the attribute `rel="http://purl.org/net/sword/terms/statement"`.
+As soon as the deposit exists, the client can track its state by downloading the SWORD [statement]{:target=_blank} from the Statement URL
+([Stat-IRI]{:target=_blank}). This URL can be found in the deposit receipt in the link with the attribute `rel="http://purl.org/net/sword/terms/statement"`.
 
-A SWORD Statement is an Atom Feed document, for example:
+A SWORD Statement is an Atom Feed document (the RDF/XML serialization is currently *not* supported by `dd-sword2`), for example:
 
 ```xml
 
@@ -216,27 +216,27 @@ A SWORD Statement is an Atom Feed document, for example:
     <link href="$SWORD_STAT_IRI" rel="self"/>
     <title type="text">Deposit a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
     <author>
-      <name>user</name>
+        <name>user</name>
     </author>
     <updated>2019-05-23T14:51:15.356Z</updated>
     <category term="ARCHIVED" scheme="http://purl.org/net/sword/terms/state" label="State"/>
     <entry>
-      <content type="multipart/related" src="urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4"/>
-      <id>urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
-      <title type="text">Resource urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
-      <summary type="text">Resource Part</summary>
-      <updated>2019-05-23T14:51:22.342Z</updated>
-      <link href="https://doi.org/10.5072/dans-Lwgy-zrn-jfyy" rel="self"/>
+        <content type="multipart/related" src="urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4"/>
+        <id>urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
+        <title type="text">Resource urn:uuid:a5bb644a-78a3-47ae-907a-0bdf162a0cd4</title>
+        <summary type="text">Resource Part</summary>
+        <updated>2019-05-23T14:51:22.342Z</updated>
+        <link href="https://doi.org/10.5072/dans-Lwgy-zrn-jfyy" rel="self"/>
     </entry>
 </feed>
 ```
 
-The Statement provides information about the deposit as it is processed by the server (`dd-sword2` and any post-submission process), most importantly the
-current state of the deposit. This can be found in the `<category>` element with the `scheme` attribute set to `http://purl.org/net/sword/terms/state`. The
-`term` attribute of this element contains the current state. The table below lists the states implemented by `dd-sword2` and their meaning. The post-submission
-process can set the state by updating the `state.label` and `state.description` properties in the [deposit.properties file]{:target=_blank}. The state labels it
-uses are transparent to `dd-sword2`. It may for example use `ARCHIVED` to indicate that post-submission processing has finished with successfully archiving the
-deposit.
+The [statement]{:target=_blank} provides information about the deposit as it is processed by the server (`dd-sword2` and any post-submission process), most
+importantly the current state of the deposit. This can be found in the `<category>` element with the `scheme` attribute set
+to `http://purl.org/net/sword/terms/state`. The `term` attribute of this element contains the current state. The table below lists the states implemented
+by `dd-sword2` and their meaning. The post-submission process can set the state by updating the `state.label` and `state.description` properties in
+the [deposit.properties file]{:target=_blank}. The state labels it uses are transparent to `dd-sword2`. It may for example use `ARCHIVED` to indicate that
+post-submission processing has finished with successfully archiving the deposit.
 
 | State        | Description                                                                                                                                                                                                                                  |
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -244,7 +244,8 @@ deposit.
 | `UPLOADED`   | The deposit is in the process of being submitted. It is waiting to be finalized. The data<br/> is completely uploaded. It will automatically move to the next stage and the status will <br/> be updated accordingly.                        | 
 | `FINALIZING` | The deposit is in the process of being submitted. It is being checked for validity. It will <br/>  automatically move to the next stage and the status will be updated accordingly.                                                          |
 | `INVALID`    | The deposit is not accepted by the archive as the submitted bag is not valid. <br/>The description will detail what part of the bag is not according to specifications. <br/>The depositor is asked to fix the bag and resubmit the deposit. |
-| `SUBMITTED`  | The deposit is submitted for processing. `dd-sword2` will not update it anymore <br/> and limit itself to providing a Statement document on request.                                                                                         | 
+| `SUBMITTED`  | The deposit is submitted for processing. `dd-sword2` will not update it anymore <br/> and limit itself to providing a Statement document on request.                                                                                         |
+| `FAILED`     | An error occurred while processing the deposit                                                                                                                                                                                               | 
 
 ARGUMENTS
 ---------
@@ -335,6 +336,8 @@ Alternatively, to build the tarball execute:
 [continued deposit]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#continueddeposit
 
 [deposit receipt]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#depositreceipt
+
+[statement]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#statement
 
 [Col-IRI]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html#terminology
 
