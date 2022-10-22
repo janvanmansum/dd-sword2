@@ -74,7 +74,7 @@ users:
 
     # The delegate that will perform a check with dataverse to verify credentials
     # This property is mutually exclusive with passwordHash
-    # passwordDelegate: http://localhost:20000/
+    # passwordDelegate: http://localhost:20340/
 
     # Collections that this user is allowed to send deposits to
     collections:
