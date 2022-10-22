@@ -36,14 +36,28 @@ server:
 sword2:
   baseUrl: # Fill in external base URL of service, e.g., https://yourserver.com/sword2/
   emailAddress: # Admin e-mail address displayed in error messages to client
+
+  # One or more collections can be defined. Users are granted permission to deposit by adding the name to the list
+  # under users[].collections
   collections:
     - name: collection1
+      # Path relative to sword2.baseUrl
       path: 1
+      # Deposits that reach one of these statuses will be removed automatically to save disk space
       autoClean:
         - INVALID
         - REJECTED
+      # Deposits that are successfully finalized are move to this directory, to hand them over to the post submission process. Once moved here
+      # dd-sword2 will no longer write to the deposit. This directory MUST be located on the same partition as "uploads", so as to make a rename-move
+      # possible
       deposits: /var/opt/dans.knaw.nl/tmp/auto-ingest/inbox
+      # When the SWORD Statement is retrieved, dd-sword2 will look in "uploads", "deposits" and then the directories configured in "depositTrackingPath"
+      # in that order.
+      depositTrackingPath: []
+      # The directory (parts of) deposits are first stored when uploaded and where the finalization process is executed. The directory MUST be on the
+      # same partition as "deposits"
       uploads: /var/opt/dans.knaw.nl/tmp/sword2-uploads
+      # The free disk space margin to use before storing new files on disk.
       diskSpaceMargin: 2G
   finalizingQueue:
     keepAliveTime: 60 seconds
@@ -69,7 +83,7 @@ users:
   #
   - name: user001
 
-    # BCrypt encrypted password
+    # BCrypt encrypted password (set to the string 'user001')
     passwordHash: $2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y
 
     # The delegate that will perform a check with dataverse to verify credentials

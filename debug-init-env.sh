@@ -20,6 +20,9 @@ TEMPDIR=data
 echo -n "Creating test directories..."
 mkdir -p data/tmp/1/uploads
 mkdir -p data/tmp/1/deposits
+mkdir -p data/tmp/1/outbox/1
+mkdir -p data/tmp/1/outbox/2
+mkdir -p data/tmp/1/outbox/3
 mkdir -p data/tmp/2/uploads
 mkdir -p data/tmp/2/deposits
 echo "OK"
