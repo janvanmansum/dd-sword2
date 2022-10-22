@@ -60,8 +60,7 @@ The service has the following interfaces.
 ### Processing
 
 The following sections describe the interaction of a client with the SWORDv2 interface. The examples are [curl]{:target=_blank} commands. The meaning of the
-shell variables is
-as follows:
+shell variables is as follows:
 
 | Variable           | Meaning                                                                                                                 |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------|
@@ -90,8 +89,7 @@ A deposit is created by [binary file deposit]{:target=_blank}. The other options
 * the `Packaging` header must be set to `http://purl.org/net/sword/package/BagIt`.
 
 It is furthermore **mandatory** to send along the `Content-MD5` header. (Note that SWORD2 requires the content of this header to be a **hex encoded** MD5
-digest,
-rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.)
+digest, rather than the base64 encoded MD5 digest specified in [RFC1864]{:target=_blank} about Content-MD5.)
 
 If `bag.zip` is such a ZIP file, then it can be uploaded as follows:
 
@@ -112,8 +110,7 @@ statement URL (Stat-IRI), which is the URL the client can use to [track post-sub
 
 If the bag to be uploaded is larger than 1G it is recommended to use a [continued deposit]{:target=_blank}. The client must split the ZIP file into chunks and
 send these in separate requests with the `In-Progress` header set to `true` for all chunks except the last. The names of the chunk files must be: the name of
-the
-complete ZIP file, extended with `.n`, where n is the sequence number.
+the complete ZIP file, extended with `.n`, where n is the sequence number.
 
 **(1)** The first chunk is sent to the collection URL ([Col-IRI]{:target=_blank} in SWORD terms), **(2)** the subsequent chunks are sent to the SWORD "edit" URL
 ([SE-IRI]{:target=_blank}), which can be found in the deposit receipt of the first upload.
@@ -137,7 +134,6 @@ curl -X POST \
 If the upload is successful the server will respond with a download receipt:
 
 ```xml
-
 <entry xmlns="http://www.w3.org/2005/Atom">
     <generator uri="http://www.swordapp.org/" version="2.0"/>
     <id>https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4</id>
@@ -155,8 +151,7 @@ If the upload is successful the server will respond with a download receipt:
 **Step (2)**
 
 Parts 2 and 3 sent to the SWORD "edit" URL ([SE-IRI]{:target=_blank}). It can be retrieved from the deposit receipt by finding the link element
-with `rel="edit"`.
-In the example this is `https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4`.
+with `rel="edit"`. In the example this is `https://swordserver.org/sword2/container/a5bb644a-78a3-47ae-907a-0bdf162a0cd4`.
 
 ```bash
 curl -X POST \
