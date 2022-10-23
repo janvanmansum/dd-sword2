@@ -255,7 +255,7 @@ ARGUMENTS
 EXAMPLES
 --------
 
-Java client code examples are available in [easy-sword2-dans-examples]{:target=_blank}.
+Java client code examples are available in [dd-dans-sword2-examples]{:target=_blank}.
 
 INSTALLATION
 ------------
@@ -310,7 +310,7 @@ Alternatively, to build the tarball execute:
 
 [deposit.properties file]: https://dans-knaw.github.io/dans-datastation-architecture/deposit-directory/#depositproperties
 
-[easy-sword2-dans-examples]: https://github.com/DANS-KNAW/easy-sword2-dans-examples
+[dd-dans-sword2-examples]: https://github.com/DANS-KNAW/dd-dans-sword2-examples
 
 [SWORDv2 specifications document]: https://swordapp.github.io/SWORDv2-Profile/SWORDProfile.html
 

@@ -31,7 +31,7 @@ import java.time.OffsetDateTime;
 
 @Singleton
 public class DepositPropertiesManagerImpl implements DepositPropertiesManager {
-    private final String FILENAME = "deposit.properties";
+    private static final String FILENAME = "deposit.properties";
 
     public DepositPropertiesManagerImpl() {
     }
