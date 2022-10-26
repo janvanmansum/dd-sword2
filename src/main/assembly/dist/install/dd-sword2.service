@@ -1,5 +1,5 @@
 [Unit]
-Description=Dd Sword2 Service
+Description=DD SWORD2 Service
 
 [Service]
 ExecStart=/opt/dans.knaw.nl/dd-sword2/bin/dd-sword2 server /etc/opt/dans.knaw.nl/dd-sword2/config.yml
@@ -10,4 +10,4 @@ User=dd-sword2
 Group=dd-sword2
 
 [Install]
-WantedBy=multi-depositor.target
+WantedBy=multi-user.target
