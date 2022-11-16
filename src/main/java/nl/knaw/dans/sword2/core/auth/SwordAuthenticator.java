@@ -80,7 +80,7 @@ public class SwordAuthenticator implements Authenticator<BasicCredentials, Depos
         try {
             var auth = basicCredentials.getUsername() + ":" + basicCredentials.getPassword();
             var encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
-            var header = String.format("Basic %s", new String(encodedAuth));
+            var header = String.format("Basic %s", new String(encodedAuth, StandardCharsets.UTF_8));
 
             var post = new HttpPost(passwordDelegate.toURI());
             post.setHeader("Authorization", header);
