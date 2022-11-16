@@ -46,19 +46,19 @@ class BaseResourceTest {
     void testEmptyContentDisposition() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
         var handler = new BaseResource(errorResponseFactory);
-        assertNull(handler.getFilenameFromContentDisposition("attachment; filename=test.zip", "wrong key"));
-        assertNull(handler.getFilenameFromContentDisposition("attachment", "does not matter"));
-        assertNull(handler.getFilenameFromContentDisposition("", "does not matter"));
-        assertNull(handler.getFilenameFromContentDisposition(null, "does not matter"));
+        assertNull(handler.getParameterValueFromContentDisposition("attachment; filename=test.zip", "wrong key"));
+        assertNull(handler.getParameterValueFromContentDisposition("attachment", "does not matter"));
+        assertNull(handler.getParameterValueFromContentDisposition("", "does not matter"));
+        assertNull(handler.getParameterValueFromContentDisposition(null, "does not matter"));
     }
 
     @Test
     void testValidContentDisposition() {
         var errorResponseFactory = Mockito.mock(ErrorResponseFactory.class);
         var handler = new BaseResource(errorResponseFactory);
-        assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment; filename=test.zip", "filename"));
-        assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment;     filename=test.zip", "filename"));
-        assertEquals("test.zip", handler.getFilenameFromContentDisposition("attachment; name=test.zip", "name"));
+        assertEquals("test.zip", handler.getParameterValueFromContentDisposition("attachment; filename=test.zip", "filename"));
+        assertEquals("test.zip", handler.getParameterValueFromContentDisposition("attachment;     filename=test.zip", "filename"));
+        assertEquals("test.zip", handler.getParameterValueFromContentDisposition("attachment; name=test.zip", "name"));
     }
 
     @Test

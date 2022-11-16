@@ -79,7 +79,12 @@ public class CollectionResourceImpl extends BaseResource implements CollectionRe
             var md5 = headers.getHeaderString("content-md5");
             var packaging = getPackaging(headers.getHeaderString("packaging"));
 
-            var filename = getFilenameFromContentDisposition(contentDisposition, "filename");
+            var filename = getParameterValueFromContentDisposition(contentDisposition, "filename");
+
+            if (filename == null) {
+                throw new InvalidHeaderException("Content-Disposition header is missing or has an invalid 'filename' parameter");
+            }
+
             var filesize = getContentLength(headers.getHeaderString("content-length"));
 
             var deposit = depositHandler.createDepositWithPayload(collectionId, depositor, inProgress, contentType, md5, packaging, filename, filesize, inputStream);

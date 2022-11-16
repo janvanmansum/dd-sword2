@@ -54,7 +54,7 @@ public class BaseResource {
         return dateTime.format(dateTimeFormatter);
     }
 
-    String getFilenameFromContentDisposition(String contentDisposition, String key) {
+    String getParameterValueFromContentDisposition(String contentDisposition, String key) {
         if (contentDisposition == null || key == null) {
             return null;
         }

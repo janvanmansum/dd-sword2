@@ -115,7 +115,7 @@ public class ContainerResourceImpl extends BaseResource implements ContainerReso
             var md5 = headers.getHeaderString("content-md5");
             var packaging = getPackaging(headers.getHeaderString("packaging"));
 
-            var filename = getFilenameFromContentDisposition(contentDisposition, "filename");
+            var filename = getParameterValueFromContentDisposition(contentDisposition, "filename");
             var filesize = getContentLength(headers.getHeaderString("content-length"));
 
             var deposit = depositHandler.addPayloadToDeposit(depositId, depositor, inProgress, contentType, md5, packaging, filename, filesize, inputStream);
