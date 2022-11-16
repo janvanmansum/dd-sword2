@@ -17,7 +17,7 @@ package nl.knaw.dans.sword2.core.service;
 
 import nl.knaw.dans.sword2.core.Deposit;
 import nl.knaw.dans.sword2.core.DepositState;
-import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.core.config.CollectionConfig;
 import nl.knaw.dans.sword2.core.config.Sword2Config;
 import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;

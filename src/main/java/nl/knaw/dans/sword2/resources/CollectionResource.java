@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.resource;
+package nl.knaw.dans.sword2.resources;
 
 import io.dropwizard.auth.Auth;
-import java.io.OutputStream;
-import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.api.statement.Feed;
 import org.glassfish.jersey.media.multipart.MultiPart;
 

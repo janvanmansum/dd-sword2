@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.resource;
+package nl.knaw.dans.sword2.resources;
 
 import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.ResourceHelpers;

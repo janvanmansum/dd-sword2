@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.resource;
+package nl.knaw.dans.sword2.resources;
 
 import nl.knaw.dans.sword2.api.entry.Link;
 import nl.knaw.dans.sword2.api.statement.Feed;
 import nl.knaw.dans.sword2.api.statement.FeedAuthor;
 import nl.knaw.dans.sword2.api.statement.FeedCategory;
 import nl.knaw.dans.sword2.api.statement.TextElement;
-import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.core.DepositState;
 import nl.knaw.dans.sword2.core.exceptions.DepositNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.InvalidDepositException;
