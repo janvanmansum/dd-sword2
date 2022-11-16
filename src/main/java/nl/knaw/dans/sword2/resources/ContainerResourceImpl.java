@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.resource;
+package nl.knaw.dans.sword2.resources;
 
 import nl.knaw.dans.sword2.core.config.UriRegistry;
-import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositReadOnlyException;
@@ -115,7 +115,7 @@ public class ContainerResourceImpl extends BaseResource implements ContainerReso
             var md5 = headers.getHeaderString("content-md5");
             var packaging = getPackaging(headers.getHeaderString("packaging"));
 
-            var filename = getFilenameFromContentDisposition(contentDisposition, "filename");
+            var filename = getParameterValueFromContentDisposition(contentDisposition, "filename");
             var filesize = getContentLength(headers.getHeaderString("content-length"));
 
             var deposit = depositHandler.addPayloadToDeposit(depositId, depositor, inProgress, contentType, md5, packaging, filename, filesize, inputStream);

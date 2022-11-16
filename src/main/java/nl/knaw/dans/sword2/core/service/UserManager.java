@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
-import nl.knaw.dans.sword2.auth.Depositor;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 
 public interface UserManager {
 

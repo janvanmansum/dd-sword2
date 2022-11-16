@@ -80,6 +80,14 @@ GET request:
 curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument
 ```
 
+!!! tip "Pretty printing XML"
+   
+    Use [xmllint]{:target=_blank} to display XML output in a more readable format (the final dash is intentional!):
+
+    ```
+    curl -X GET -u $USER:$PASSWORD $SWORD_BASE_URL/servicedocument | xmllint --format - 
+    ```
+
 #### Creating and submitting a deposit
 
 A deposit is created by [binary file deposit]{:target=_blank}. The other options that SWORDv2 specifies are currently not supported. Furthermore, the only
@@ -347,3 +355,5 @@ Alternatively, to build the tarball execute:
 [curl]: https://www.man7.org/linux/man-pages/man1/curl.1.html
 
 [RFC1864]: https://www.rfc-editor.org/rfc/rfc1864.html
+
+[xmllint]: https://linux.die.net/man/1/xmllint

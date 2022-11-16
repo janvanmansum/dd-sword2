@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.auth;
+package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
@@ -52,6 +52,7 @@ public class SwordAuthenticator implements Authenticator<BasicCredentials, Depos
             throw new AuthenticationException("No users available");
         }
 
+        //FIXME: refactor this: first get the user config, then authenticate. Also make sure the some other response status than 204 or 401 leads to a clear error message
         for (var user : userList) {
             if (user.getName().equals(credentials.getUsername())) {
                 log.debug("Authenticating user {}", credentials.getUsername());
