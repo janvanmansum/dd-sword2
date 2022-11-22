@@ -48,7 +48,7 @@ public class ServiceDocumentResourceImpl implements ServiceDocumentResource {
         service.setVersion("2.0");
 
         var workspace = new ServiceWorkspace();
-        workspace.setTitle("EASY SWORD2 Deposit Service");
+        workspace.setTitle("Data Station SWORD2 Deposit Service");
 
         var collections = collectionConfigs.stream()
             .filter(collection -> depositor.getCollections().contains(collection.getName()))
@@ -57,6 +57,7 @@ public class ServiceDocumentResourceImpl implements ServiceDocumentResource {
                 c.setHref(baseUri.resolve("collection/" + collection.getPath()));
                 c.setMediation(false);
                 c.setTitle(collection.getName());
+                c.SetAcceptedMediaTypes("application/zip", "application/octet-stream");
                 c.setAcceptPackaging(UriRegistry.PACKAGE_BAGIT);
 
                 log.trace("Service collection for depositor {}: {}", depositor, c);
