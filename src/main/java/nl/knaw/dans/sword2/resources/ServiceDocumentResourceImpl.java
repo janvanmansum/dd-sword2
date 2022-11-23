@@ -57,7 +57,7 @@ public class ServiceDocumentResourceImpl implements ServiceDocumentResource {
                 c.setHref(baseUri.resolve("collection/" + collection.getPath()));
                 c.setMediation(false);
                 c.setTitle(collection.getName());
-                c.SetAcceptedMediaTypes("application/zip", "application/octet-stream");
+                c.setAcceptedMediaTypes("application/zip", "application/octet-stream");
                 c.setAcceptPackaging(UriRegistry.PACKAGE_BAGIT);
 
                 log.trace("Service collection for depositor {}: {}", depositor, c);

@@ -44,7 +44,7 @@ public class ServiceCollection {
         return accept;
     }
 
-    public void SetAcceptedMediaTypes(String... mediaTypes) {
+    public void setAcceptedMediaTypes(String... mediaTypes) {
         accept = Arrays.stream(mediaTypes).collect(Collectors.toList());
     }
 
