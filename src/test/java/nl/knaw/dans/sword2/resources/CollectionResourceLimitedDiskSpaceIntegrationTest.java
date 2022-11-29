@@ -21,6 +21,8 @@ import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import nl.knaw.dans.sword2.DdSword2Application;
 import nl.knaw.dans.sword2.DdSword2Configuration;
+import nl.knaw.dans.sword2.TestFixture;
+import nl.knaw.dans.sword2.TestFixtureExt;
 import nl.knaw.dans.sword2.core.service.FileServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -34,26 +36,24 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-class CollectionResourceLimitedDiskSpaceIntegrationTest {
-
-    private final DropwizardAppExtension<DdSword2Configuration> EXT = new DropwizardAppExtension<>(
-        DdSword2Application.class,
-        ResourceHelpers.resourceFilePath("test-etc/config-bigmargin.yml")
-    );
+class CollectionResourceLimitedDiskSpaceIntegrationTest extends TestFixtureExt {
+    public CollectionResourceLimitedDiskSpaceIntegrationTest() {
+        super("test-etc/config-bigmargin.yml");
+    }
 
     @BeforeEach
     void startUp() throws IOException {
-        new FileServiceImpl().ensureDirectoriesExist(Path.of("data/tmp/1"));
+        new FileServiceImpl().ensureDirectoriesExist(testDir.resolve("1"));
     }
 
     @AfterEach
-    void tearDown() throws IOException {
-        FileUtils.deleteDirectory(Path.of("data/tmp").toFile());
-        ((LoggerContext)org.slf4j.LoggerFactory.getILoggerFactory()).stop();
+    void tearDown() {
+        ((LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory()).stop();
     }
 
     @Test
