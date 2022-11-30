@@ -16,6 +16,9 @@
 package nl.knaw.dans.sword2.api.service;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,6 +37,16 @@ public class ServiceCollection {
     private String acceptPackaging;
     @XmlElement(namespace = "http://purl.org/net/sword/terms/")
     private boolean mediation;
+
+    private List<String> accept;
+
+    public List<String> getAcceptedMediaTypes() {
+        return accept;
+    }
+
+    public void setAcceptedMediaTypes(String... mediaTypes) {
+        accept = Arrays.stream(mediaTypes).collect(Collectors.toList());
+    }
 
     public URI getHref() {
         return href;
@@ -73,6 +86,7 @@ public class ServiceCollection {
             "href=" + href +
             ", title='" + title + '\'' +
             ", acceptPackaging='" + acceptPackaging + '\'' +
+            ", accept='" + accept.toString() + '\'' +
             ", mediation=" + mediation +
             '}';
     }

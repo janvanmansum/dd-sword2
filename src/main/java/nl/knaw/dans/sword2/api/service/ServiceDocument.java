@@ -27,8 +27,7 @@ public class ServiceDocument {
 
     @XmlElement(namespace = "http://purl.org/net/sword/terms/")
     private String version;
-    @XmlElement(namespace = "http://purl.org/net/sword/terms/")
-    private int maxUploadSize = -1;
+
     @XmlElement(name = "workspace")
     private List<ServiceWorkspace> workspaces;
 
@@ -46,13 +45,5 @@ public class ServiceDocument {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public int getMaxUploadSize() {
-        return maxUploadSize;
-    }
-
-    public void setMaxUploadSize(int maxUploadSize) {
-        this.maxUploadSize = maxUploadSize;
     }
 }

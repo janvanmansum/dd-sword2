@@ -63,7 +63,7 @@ class ServiceDocumentResourceImplIntegrationTest extends TestFixtureExt {
 
         var workspace = serviceDocument.getWorkspaces().get(0);
 
-        assertEquals("EASY SWORD2 Deposit Service", workspace.getTitle());
+        assertEquals("Data Station SWORD2 Deposit Service", workspace.getTitle());
         assertEquals(2, workspace.getCollections().size());
         var collection1 = workspace.getCollections().get(0);
         var collection2 = workspace.getCollections().get(1);
@@ -79,6 +79,6 @@ class ServiceDocumentResourceImplIntegrationTest extends TestFixtureExt {
         assertEquals("http://purl.org/net/sword/package/BagIt", collection2.getAcceptPackaging());
 
         var checksum = result.getHeaderString("Content-MD5");
-        assertEquals("1c62de3fac16661d834bd3c4b6318c96", checksum);
+        assertEquals("41cca0f9ff96ab2673db7a6a2fe081a7", checksum);
     }
 }
