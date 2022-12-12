@@ -249,7 +249,7 @@ class CollectionResourceImplIntegrationTest extends TestFixtureExt {
 
         assertEquals("SUBMITTED", state);
 
-        var firstPath = testDir.resolve("1/uploads/").resolve(id);
+        var firstPath = testDir.resolve("1/deposits/").resolve(id);
         assertTrue(Files.exists(firstPath.resolve("deposit.properties")));
         assertTrue(Files.exists(firstPath.resolve("audiences/bagit.txt")));
         assertFalse(Files.exists(firstPath.resolve("bag.zip.1")));
