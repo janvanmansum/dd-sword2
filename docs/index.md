@@ -32,7 +32,7 @@ those often, especially:
 At the highest level `dd-sword2` is a service that accepts ZIP packages that comply with the [BagIt]{:target=_blank} packaging format and produces a
 [deposit directory]{:target=_blank} for each.
 
-### Interfaces
+### Interfaces (provided)
 
 The service has the following interfaces.
 
@@ -56,6 +56,16 @@ The service has the following interfaces.
 * _Protocol type_: HTTP
 * _Internal or external_: **internal**
 * _Purpose_: application monitoring and management
+
+### Interfaces (consumed)
+
+The service consumes the following interfaces.
+
+#### Auth delegate
+
+* _Protocol type_: HTTP Basic Auth
+* _Internal or external_: **internal**
+* _Purpose_: delegate basic auth authentication of a client for SWORD2
 
 ### Processing
 
