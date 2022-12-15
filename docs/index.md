@@ -112,15 +112,17 @@ digest, rather than the base64 encoded MD5 digest specified in [RFC1864]{:target
 If `bag.zip` is such a ZIP file, then it can be uploaded as follows:
 
 ```bash
+export BAG=bag.zip
 curl -X POST \
      -H 'Content-Type: application/zip' \
      -H 'Content-Disposition: attachment; filename=bag.zip' \
-     -H "Content-MD5: $(md5 -q bag.zip)" \ 
+     -H "Content-MD5: $(md5 -q $BAG)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data-binary @bag.zip -u $USER:$PASSWORD $SWORD_COL_IRI
+     --data-binary @$BAG -u $USER:$PASSWORD $SWORD_COL_IRI
 ```
 
-(The `md5` command used above is the one from BSD and MacOS. You may have to get the correct output in a different way on other systems.)
+(The `md5` command used above is the one from BSD and MacOS. You may have to get the correct output in a different way on other systems.
+On Linux you can use `$(md5sum $BAG | cut -d ' ' -f)`.)
 
 If the upload is successful, the client will receive a [deposit receipt]{:target=_blank}. This is an Atom Entry document that contains, among other things, the
 statement URL (Stat-IRI), which is the URL the client can use to [track post-submision processing](#tracking-post-submission-processing).
@@ -142,13 +144,14 @@ If `bag.zip.1`, `bag.zip.2` and `bag.zip.3` are the chunks created by splitting 
 **Step (1)**
 
 ```bash
+export BAG=bag.zip
 curl -X POST \
      -H 'Content-Type: application/octet-stream' \
      -H 'Content-Disposition: attachment; filename=bag.zip.1' \
      -H 'In-Progress: true' \
-     -H "Content-MD5: $(md5 -q bag.zip.1)" \ 
+     -H "Content-MD5: $(md5 -q ${BAG}.1)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data-binary @bag.zip.1 -u $USER:$PASSWORD $SWORD_COL_IRI
+     --data-binary @${BAG}.1 -u $USER:$PASSWORD $SWORD_COL_IRI
 ```
 
 If the upload is successful the server will respond with a download receipt:
@@ -178,9 +181,9 @@ curl -X POST \
      -H 'Content-Type: application/octet-stream' \
      -H 'Content-Disposition: attachment; filename=bag.zip.2' \
      -H 'In-Progress: true' \
-     -H "Content-MD5: $(md5 -q bag.zip.2)" \ 
+     -H "Content-MD5: $(md5 -q ${BAG}.2)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data-binary @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+     --data-binary @${BAG}.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
 ```
 
 For the last part the `In-Progress` header is set to false.
@@ -190,9 +193,9 @@ curl -X POST \
      -H 'Content-Type: application/octet-stream' \
      -H 'Content-Disposition: attachment; filename=bag.zip.3' \
      -H 'In-Progress: false' \
-     -H "Content-MD5: $(md5 -q bag.zip.3)" \ 
+     -H "Content-MD5: $(md5 -q ${BAG}.3)" \ 
      -H 'Packaging: http://purl.org/net/sword/package/BagIt' \
-     --data-binary @bag.zip.2 -u $USER:$PASSWORD $SWORD_EDIT_IRI
+     --data-binary @${BAG}.3 -u $USER:$PASSWORD $SWORD_EDIT_IRI
 ```
 
 After this, the client will have to wait for the server to process the deposit. It should [track the progress](#tracking-post-submission-processing) until the
