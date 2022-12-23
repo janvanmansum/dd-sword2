@@ -189,7 +189,7 @@
             <plugin>
                 <groupId>nl.knaw.dans</groupId>
                 <artifactId>dans-nexus-maven-plugin</artifactId>
-                <version>0.1.0-SNAPSHOT</version>
+                <version>0.1.0</version>
                 <configuration>
                     <nexusUserName>${env.NEXUS_USER}</nexusUserName>
                     <nexusPassword>${env.NEXUS_PASSWORD}</nexusPassword>
