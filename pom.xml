@@ -183,6 +183,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>nl.knaw.dans</groupId>
                 <artifactId>dans-nexus-maven-plugin</artifactId>
                 <version>0.1.0</version>
