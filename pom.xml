@@ -16,15 +16,15 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>dans-dropwizard-project</artifactId>
-        <groupId>nl.knaw.dans.shared</groupId>
-        <version>9.5.0</version>
+        <groupId>nl.knaw.dans</groupId>
+        <artifactId>dd-parent</artifactId>
+        <version>0.10.0</version>
     </parent>
-    <groupId>nl.knaw.dans</groupId>
     <artifactId>dd-sword2</artifactId>
     <version>0.3.2-SNAPSHOT</version>
 
@@ -174,31 +174,28 @@
         </repository>
     </repositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>nl.knaw.dans</groupId>
-                <artifactId>dans-nexus-maven-plugin</artifactId>
-                <version>0.1.0</version>
-                <configuration>
-                    <nexusUserName>${env.NEXUS_USER}</nexusUserName>
-                    <nexusPassword>${env.NEXUS_PASSWORD}</nexusPassword>
-                    <rpmRepositoryUrl>http://nexus.dans.knaw.nl/repository/rpm-releases</rpmRepositoryUrl>
-                    <snapshotRpmRepositoryUrl>http://nexus.dans.knaw.nl/repository/rpm-snapshots</snapshotRpmRepositoryUrl>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>dans-releases</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>https://maven.dans.knaw.nl/releases/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>dans-snapshots</id>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>https://maven.dans.knaw.nl/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <profiles>
         <profile>
@@ -214,17 +211,21 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>rpm-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-rpm</id>
-                                <goals>
-                                    <goal>attached-rpm</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Do not deploy to Maven, but instead to YUM repo with dans-nexus-maven-plugin -->
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>nl.knaw.dans</groupId>
+                        <artifactId>dans-nexus-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
+
 </project>
