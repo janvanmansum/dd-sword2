@@ -434,7 +434,7 @@ class CollectionResourceImplIntegrationTest extends TestFixtureExt {
         var error = result.readEntity(Error.class);
         assertEquals("ERROR", error.getTitle());
         assertEquals("Processing failed", error.getTreatment());
-        assertEquals("http://purl.org/net/sword/error/ErrorChecksumMismatch", error.getSummary());
+        assertEquals("Checksum sent does not match the calculated checksum", error.getSummary());
     }
 
     @Test
