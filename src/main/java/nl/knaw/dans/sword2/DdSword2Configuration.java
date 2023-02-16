@@ -30,7 +30,6 @@ import java.util.List;
 public class DdSword2Configuration extends Configuration {
 
     @Valid
-    @NotEmpty
     private List<UserConfig> users;
 
     @Valid
