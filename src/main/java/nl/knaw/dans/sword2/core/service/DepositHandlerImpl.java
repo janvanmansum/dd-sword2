@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
@@ -50,7 +51,10 @@ import java.util.stream.Stream;
 public class DepositHandlerImpl implements DepositHandler {
 
     private static final Logger log = LoggerFactory.getLogger(DepositHandlerImpl.class);
-
+    private static final Set<MediaType> SUPPORTED_CONTENT_TYPES = Set.of(
+        new MediaType("application", "zip"),
+        new MediaType("application", "octet-stream")
+    );
     private final BagExtractor bagExtractor;
     private final FileService fileService;
     private final DepositPropertiesManager depositPropertiesManager;
@@ -76,7 +80,8 @@ public class DepositHandlerImpl implements DepositHandler {
 
     @Override
     public Deposit createDepositWithPayload(String collectionId, Depositor depositor, boolean inProgress, MediaType contentType, String hash, String packaging, String filename, long filesize,
-        InputStream inputStream) throws CollectionNotFoundException, IOException, NotEnoughDiskSpaceException, HashMismatchException, InvalidDepositException, InvalidSupportedBagPackagingException, InvalidContentTypeException {
+        InputStream inputStream) throws CollectionNotFoundException, IOException, NotEnoughDiskSpaceException, HashMismatchException, InvalidDepositException, InvalidSupportedBagPackagingException,
+        InvalidContentTypeException {
 
         var id = UUID.randomUUID().toString();
         var collection = collectionManager.getCollectionByPath(collectionId, depositor);
@@ -95,7 +100,7 @@ public class DepositHandlerImpl implements DepositHandler {
                 throw new HashMismatchException(String.format("Hash %s does not match expected hash %s", calculatedHash, hash));
             }
 
-            CheckContentError(contentType, packaging);
+            checkContentError(contentType, packaging);
 
             var deposit = new Deposit();
             deposit.setId(id);
@@ -126,11 +131,13 @@ public class DepositHandlerImpl implements DepositHandler {
         }
     }
 
-    private void CheckContentError(MediaType contentType, String packaging) throws InvalidSupportedBagPackagingException, InvalidContentTypeException {
-        if (!packaging.isEmpty() && !confirmPackageHeader(packaging))
+    private void checkContentError(MediaType contentType, String packaging) throws InvalidSupportedBagPackagingException, InvalidContentTypeException {
+        if (!packaging.isEmpty() && !confirmPackageHeader(packaging)) {
             throw new InvalidSupportedBagPackagingException(String.format("Unsupported Media Type %s", packaging));
-        if (!confirmContentType(contentType))
+        }
+        if (!confirmContentType(contentType)) {
             throw new InvalidContentTypeException(String.format("Not Acceptable content type %s", contentType));
+        }
     }
 
     void cleanupFile(Path path) {
@@ -443,10 +450,10 @@ public class DepositHandlerImpl implements DepositHandler {
     }
 
     private boolean confirmPackageHeader(String packageHeader) {
-        return UriRegistry.PACKAGE_BAGIT.equals(packageHeader) ;
+        return UriRegistry.PACKAGE_BAGIT.equals(packageHeader);
     }
 
     private boolean confirmContentType(MediaType contentType) {
-        return UriRegistry.supportedContentType.contains(contentType);
+        return SUPPORTED_CONTENT_TYPES.contains(contentType);
     }
 }

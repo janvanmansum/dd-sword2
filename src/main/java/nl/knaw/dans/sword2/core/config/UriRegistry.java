@@ -19,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-
 public class UriRegistry {
     // Namespace prefixes
     public static final String SWORD_PREFIX = "sword";
@@ -66,5 +65,4 @@ public class UriRegistry {
     public static final String PACKAGE_SIMPLE_ZIP = "http://purl.org/net/sword/package/SimpleZip";
     public static final String PACKAGE_BINARY = "http://purl.org/net/sword/package/Binary";
     public static final String PACKAGE_BAGIT = "http://purl.org/net/sword/package/BagIt";
-    public static final  List<MediaType> supportedContentType = List.of( new MediaType("application","zip"), new MediaType("application","octet-stream"));
 }

@@ -48,10 +48,6 @@ public class SwordAuthenticator implements Authenticator<BasicCredentials, Depos
 
     @Override
     public Optional<Depositor> authenticate(BasicCredentials credentials) throws AuthenticationException {
-        if (userList.size() == 0) {
-            throw new AuthenticationException("No users available");
-        }
-
         //FIXME: refactor this: first get the user config, then authenticate. Also make sure the some other response status than 204 or 401 leads to a clear error message
         for (var user : userList) {
             if (user.getName().equals(credentials.getUsername())) {

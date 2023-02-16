@@ -33,8 +33,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SwordAuthenticatorTest {
@@ -47,13 +47,19 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void testEmptyUserList() {
+    void authenticate_should_return_empty_optional_if_no_users_are_configured() {
         var emptyList = new ArrayList<UserConfig>();
-        assertThrows(AuthenticationException.class, () -> new SwordAuthenticator(emptyList, httpClient).authenticate(new BasicCredentials("user", "password")));
+
+        var result = assertDoesNotThrow(() ->
+            new SwordAuthenticator(emptyList, httpClient)
+                .authenticate(new BasicCredentials("user", "password")
+                ));
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void testReturnsEmpty() throws AuthenticationException {
+    void authenticate_should_return_empty_optional_if_password_is_incorrect() throws AuthenticationException {
         var password = BCrypt.hashpw("password", BCrypt.gensalt());
         var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>(), null));
 
@@ -61,7 +67,7 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void testReturnsUser() throws AuthenticationException {
+    void authenticate_should_return_user_if_username_and_password_are_correct() throws AuthenticationException {
         var password = BCrypt.hashpw("password", BCrypt.gensalt());
         var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>(), null));
 
@@ -69,7 +75,7 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void testReturnsUserWithDelegate() throws AuthenticationException, IOException {
+    void authenticate_should_call_delegate_http_service_if_config_says_so() throws AuthenticationException, IOException {
         var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>(), new URL("http://test.com/")));
 
         var protocol = new ProtocolVersion("http", 1, 1);
@@ -83,11 +89,26 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void testReturnsNoUserWithDelegate() throws AuthenticationException, IOException {
+    void authenticate_should_return_empty_optional_if_delegate_returns_401_unauthorized() throws AuthenticationException, IOException {
         var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>(), new URL("http://test.com/")));
 
         var protocol = new ProtocolVersion("http", 1, 1);
         var status = new BasicStatusLine(protocol, 401, "Unauthorized");
+        var fakeResponse = new BasicHttpResponse(status, null, null);
+
+        Mockito.when(httpClient.execute(Mockito.any()))
+            .thenReturn(fakeResponse);
+
+        assertTrue(new SwordAuthenticator(userList, httpClient)
+            .authenticate(new BasicCredentials("user001", "password")).isEmpty());
+    }
+
+    @Test
+    void authenticate_should_return_empty_optional_if_delegate_returns_500_error() throws AuthenticationException, IOException {
+        var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>(), new URL("http://test.com/")));
+
+        var protocol = new ProtocolVersion("http", 1, 1);
+        var status = new BasicStatusLine(protocol, 500, "Internal Server Error");
         var fakeResponse = new BasicHttpResponse(status, null, null);
 
         Mockito.when(httpClient.execute(Mockito.any()))
