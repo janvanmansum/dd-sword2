@@ -71,8 +71,11 @@ class StatementResourceImplIntegrationTest extends TestFixtureExt {
         deposit.setState(DepositState.SUBMITTED);
         deposit.setStateDescription("Submitted");
         deposit.setDepositor("user001");
+        deposit.setDoi("10.80270/test-xsc-h372");
+        deposit.setUrn("urn:nbn:nl:ui:13-cj-gxo0");
 
-        new DepositPropertiesManagerImpl().saveProperties(testDir.resolve("1/deposits/a03ca6f1-608b-4247-8c22-99681b8494a0"), deposit);
+        new DepositPropertiesManagerImpl().saveProperties(
+            testDir.resolve("1/deposits/a03ca6f1-608b-4247-8c22-99681b8494a0"), deposit);
 
         var url = String.format("http://localhost:%s/statement/a03ca6f1-608b-4247-8c22-99681b8494a0", EXT.getLocalPort());
         var response = EXT.client()
@@ -88,8 +91,11 @@ class StatementResourceImplIntegrationTest extends TestFixtureExt {
         assertEquals("http://localhost:20320/statement/a03ca6f1-608b-4247-8c22-99681b8494a0", feed.getId());
         assertEquals("SUBMITTED", feed.getCategory().getTerm());
 
-        var hash = response.getHeaderString("content-md5");
-        assertEquals("415dd6ceb5fdf42e8245b1a70e0bd407"/*ALI "30d203e2d0c5e349921a8317f66b759b"*/, hash);
+        var entry = feed.getEntries().get(0);
+        assertEquals("urn:uuid:" + deposit.getId(), entry.getId());
+        assertEquals("Resource Part", entry.getSummary().getText());
+        assertEquals("Resource urn:uuid:" + deposit.getId(), entry.getTitle().getText());
+        assertEquals("https://doi.org/" + deposit.getDoi(), entry.getLinks().get(0).getHref().toString());
     }
 
     @Test
@@ -149,8 +155,5 @@ class StatementResourceImplIntegrationTest extends TestFixtureExt {
 
         assertEquals("http://localhost:20320/statement/a03ca6f1-608b-4247-8c22-99681b8494a0", feed.getId());
         assertEquals("SUBMITTED", feed.getCategory().getTerm());
-
-        var hash = response.getHeaderString("content-md5");
-        assertEquals("415dd6ceb5fdf42e8245b1a70e0bd407"/*ALI "30d203e2d0c5e349921a8317f66b759b */, hash);
     }
 }

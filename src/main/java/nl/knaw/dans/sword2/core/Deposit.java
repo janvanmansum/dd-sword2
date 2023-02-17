@@ -20,6 +20,8 @@ import java.time.OffsetDateTime;
 
 public class Deposit {
     private String id;
+    private String doi;
+    private String urn;
     private String filename;
     private String mimeType;
     private String slug = null;
@@ -199,10 +201,28 @@ public class Deposit {
         this.contentLength = contentLength;
     }
 
+    public String getDoi() {
+        return doi;
+    }
+
+    public void setDoi(String doi) {
+        this.doi = doi;
+    }
+
+    public String getUrn() {
+        return urn;
+    }
+
+    public void setUrn(String urn) {
+        this.urn = urn;
+    }
+
     @Override
     public String toString() {
         return "Deposit{" +
             "id='" + id + '\'' +
+            ", doi='" + doi + '\'' +
+            ", urn='" + urn + '\'' +
             ", filename='" + filename + '\'' +
             ", mimeType='" + mimeType + '\'' +
             ", slug='" + slug + '\'' +
@@ -211,10 +231,13 @@ public class Deposit {
             ", depositor='" + depositor + '\'' +
             ", bagName='" + bagName + '\'' +
             ", swordToken='" + swordToken + '\'' +
+            ", otherId='" + otherId + '\'' +
+            ", otherIdVersion='" + otherIdVersion + '\'' +
             ", created=" + created +
             ", state=" + state +
             ", stateDescription='" + stateDescription + '\'' +
             ", path=" + path +
+            ", collectionId='" + collectionId + '\'' +
             ", inProgress=" + inProgress +
             ", metadataRelevant=" + metadataRelevant +
             ", contentLength=" + contentLength +

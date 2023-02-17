@@ -55,6 +55,7 @@ public class DepositHandlerImpl implements DepositHandler {
         new MediaType("application", "zip"),
         new MediaType("application", "octet-stream")
     );
+
     private final BagExtractor bagExtractor;
     private final FileService fileService;
     private final DepositPropertiesManager depositPropertiesManager;

@@ -15,10 +15,14 @@
  */
 package nl.knaw.dans.sword2.api.statement;
 
+import nl.knaw.dans.sword2.api.entry.Link;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlRootElement(name = "entry")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -32,6 +36,10 @@ public class FeedEntry {
     private TextElement summary;
     @XmlElement
     private FeedContent content;
+    @XmlElement
+    private String updated;
+    @XmlElement(name = "link")
+    private List<Link> links = new ArrayList<>();
 
     public FeedEntry() {
 
@@ -76,8 +84,31 @@ public class FeedEntry {
         this.content = content;
     }
 
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(String updated) {
+        this.updated = updated;
+    }
+
     @Override
     public String toString() {
-        return "FeedEntry{" + "id='" + id + '\'' + ", title=" + title + ", summary=" + summary + ", content=" + content + '}';
+        return "FeedEntry{" +
+            "id='" + id + '\'' +
+            ", title=" + title +
+            ", summary=" + summary +
+            ", content=" + content +
+            ", updated='" + updated + '\'' +
+            ", links=" + links +
+            '}';
     }
 }
