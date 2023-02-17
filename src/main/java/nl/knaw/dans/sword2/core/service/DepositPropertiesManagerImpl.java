@@ -89,6 +89,8 @@ public class DepositPropertiesManagerImpl implements DepositPropertiesManager {
         deposit.setBagName(config.getString("bag-store.bag-name"));
         deposit.setSwordToken(config.getString("dataverse.sword-token"));
         deposit.setMimeType(config.getString("easy-sword2.client-message.content-type"));
+        deposit.setDoi(config.getString("identifier.doi"));
+        deposit.setUrn(config.getString("identifier.urn"));
 
         return deposit;
     }
@@ -103,6 +105,8 @@ public class DepositPropertiesManagerImpl implements DepositPropertiesManager {
         config.setProperty("state.description", deposit.getStateDescription());
         config.setProperty("bag-store.bag-name", deposit.getBagName());
         config.setProperty("dataverse.sword-token", deposit.getSwordToken());
+        config.setProperty("identifier.doi", deposit.getDoi());
+        config.setProperty("identifier.urn", deposit.getUrn());
 
         if (deposit.getOtherId() != null && !deposit.getOtherId().isEmpty()) {
             config.setProperty("dataverse.other-id", deposit.getOtherId());
