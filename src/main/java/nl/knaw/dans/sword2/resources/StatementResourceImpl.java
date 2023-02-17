@@ -66,7 +66,6 @@ public class StatementResourceImpl extends BaseResource implements StatementReso
         try {
             var deposit = depositHandler.getDeposit(depositId, depositor);
 
-            System.out.println("DEPOSIT: " + deposit);
             feed.setUpdated(deposit.getCreated().toString());
             feed.setCategory(new FeedCategory("State", "http://purl.org/net/sword/terms/state",
                 deposit.getState().toString(), deposit.getStateDescription()));
