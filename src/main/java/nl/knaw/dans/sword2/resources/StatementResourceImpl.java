@@ -61,7 +61,7 @@ public class StatementResourceImpl extends BaseResource implements StatementReso
         feed.setId(url);
         feed.setTitle(new TextElement(String.format("Deposit %s", depositId), "text"));
         feed.addLink(new Link(URI.create(url), "self", null));
-        feed.getAuthors().add(new FeedAuthor("DANS-EASY"));
+        feed.getAuthors().add(new FeedAuthor("DANS SWORD2"));
 
         try {
             var deposit = depositHandler.getDeposit(depositId, depositor);
