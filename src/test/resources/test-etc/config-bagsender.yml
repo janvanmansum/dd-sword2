@@ -13,12 +13,18 @@ server:
   requestLog:
     appenders: [ ]
 
-users:
-  - name: 'user001'
-    passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y'
-    filepathMapping: true
-    collections:
-      - collection1
+authorization:
+  passwordDelegate:
+    url: http://localhost:20000/
+    forwardHeaders:
+      - authorization
+      - x-dataverse-key
+  users:
+    - name: 'user001'
+      passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y'
+      filepathMapping: true
+      collections:
+        - collection1
 
 sword2:
   baseUrl: 'http://localhost:20320/'
