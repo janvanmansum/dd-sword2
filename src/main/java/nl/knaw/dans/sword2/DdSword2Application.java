@@ -25,6 +25,7 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import nl.knaw.dans.sword2.core.auth.AuthenticationService;
 import nl.knaw.dans.sword2.core.auth.AuthenticationServiceImpl;
 import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.core.auth.HeaderAuthenticationFilter;
@@ -112,7 +113,10 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         // Add a md5 output hash header
         environment.jersey().register(HashHeaderInterceptor.class);
 
-        var dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getAuthorization().getPasswordDelegateConfig(), httpClient, environment.getObjectMapper());
+        AuthenticationService dataverseAuthenticator = null;
+        if (configuration.getAuthorization().getPasswordDelegateConfig() != null) {
+            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getAuthorization().getPasswordDelegateConfig(), httpClient, environment.getObjectMapper());
+        }
 
         environment.jersey().register(new AuthDynamicFeature(
             new HeaderAuthenticationFilter.Builder<Depositor>()
