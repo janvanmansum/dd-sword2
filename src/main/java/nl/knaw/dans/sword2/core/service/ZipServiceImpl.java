@@ -49,6 +49,10 @@ public class ZipServiceImpl implements ZipService {
 
         zipFile.stream().filter(e -> !e.getName().endsWith("/")).forEach(entry -> {
             var name = entry.getName();
+            if (name.startsWith("../")) {
+                log.warn("Ignoring entry {} because it is outside the target directory", name);
+                return;
+            }
             var target = targetPath.resolve(Path.of(fileMapping.getOrDefault(name, name)));
 
             try {
