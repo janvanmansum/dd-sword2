@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class ZipServiceImpl implements ZipService {
 
         zipFile.stream().filter(e -> !e.getName().endsWith("/")).forEach(entry -> {
             var name = entry.getName();
-            if (name.contains("../")) {
+            if (!targetPath.resolve(name).normalize().startsWith(targetPath.normalize())) {
                 log.warn("Ignoring entry {} because it is outside the target directory", name);
                 return;
             }
