@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class InvalidDepositException extends Throwable {
+public class InvalidDepositException extends Exception {
     public InvalidDepositException(String msg) {
         super(msg);
     }

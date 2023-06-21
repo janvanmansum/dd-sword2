@@ -51,7 +51,7 @@ class ZipServiceImplTest {
     }
 
     @Test
-    void testAllFilesAreExtractedWithoutFileMapping() throws IOException {
+    void testAllFilesAreExtractedWithoutFileMapping() throws Exception {
         var file = Mockito.mock(ZipFile.class);
         var fileService = Mockito.mock(FileService.class);
 
@@ -78,7 +78,7 @@ class ZipServiceImplTest {
     }
 
     @Test
-    void testAllFilesAreExtractedWithFileMapping() throws IOException {
+    void testAllFilesAreExtractedWithFileMapping() throws Exception {
         var file = Mockito.mock(ZipFile.class);
         var fileService = Mockito.mock(FileService.class);
 

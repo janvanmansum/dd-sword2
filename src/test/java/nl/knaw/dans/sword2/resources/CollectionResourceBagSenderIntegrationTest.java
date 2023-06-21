@@ -235,11 +235,11 @@ class CollectionResourceBagSenderIntegrationTest extends TestFixtureExt {
                 return depositPropertiesManager.getProperties(BASE_PATH.resolve("deposits").resolve(id));
 
             }
-            catch (Exception | InvalidDepositException e) {
+            catch (Exception e) {
                 try {
                     return depositPropertiesManager.getProperties(BASE_PATH.resolve("uploads").resolve(id));
                 }
-                catch (Exception | InvalidDepositException e2) {
+                catch (Exception e2) {
                     count += 1;
                     Thread.sleep(100);
                 }

@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class DepositReadOnlyException extends Throwable {
+public class DepositReadOnlyException extends Exception {
     public DepositReadOnlyException(String msg) {
         super(msg);
     }

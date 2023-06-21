@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class DepositNotFoundException extends Throwable {
+public class DepositNotFoundException extends Exception {
     public DepositNotFoundException(String msg) {
         super(msg);
     }

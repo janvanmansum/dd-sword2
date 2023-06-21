@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class InvalidPartialFileException extends Throwable {
+public class InvalidPartialFileException extends Exception {
     public InvalidPartialFileException(String msg) {
         super(msg);
     }

@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
+import nl.knaw.dans.sword2.core.exceptions.InvalidDepositException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,29 +42,23 @@ public class ZipServiceImpl implements ZipService {
     }
 
     @Override
-    public void extractZipFileWithFileMapping(Path path, Path targetPath, Map<String, String> fileMapping) throws IOException {
+    public void extractZipFileWithFileMapping(Path path, Path targetPath, Map<String, String> fileMapping) throws IOException, InvalidDepositException {
         var file = new ZipFile(path.toFile());
         extractZipFileWithFileMapping(file, targetPath, fileMapping);
     }
 
-    void extractZipFileWithFileMapping(ZipFile zipFile, Path targetPath, Map<String, String> fileMapping) {
+    void extractZipFileWithFileMapping(ZipFile zipFile, Path targetPath, Map<String, String> fileMapping) throws IOException, InvalidDepositException {
 
-        zipFile.stream().filter(e -> !e.getName().endsWith("/")).forEach(entry -> {
+        List<ZipEntry> fileEntries = zipFile.stream().filter(e -> !e.getName().endsWith("/")).collect(Collectors.toList());
+
+        for (ZipEntry entry : fileEntries) {
             var name = entry.getName();
             if (!targetPath.resolve(name).normalize().startsWith(targetPath.normalize())) {
-                log.warn("Ignoring entry {} because it is outside the target directory", name);
-                return;
+                throw new InvalidDepositException(String.format("Entry is extracted to a folder outside the target folder: %s", name));
             }
             var target = targetPath.resolve(Path.of(fileMapping.getOrDefault(name, name)));
-
-            try {
-                log.trace("Extracting entry {} to target destination {}", entry.getName(), target);
-                fileService.copyFile(zipFile.getInputStream(entry), target);
-            }
-            catch (IOException e) {
-                log.error("Unable to copy entry {} to {}", entry.getName(), target, e);
-            }
-        });
+            fileService.copyFile(zipFile.getInputStream(entry), target);
+        }
     }
 
     @Override
