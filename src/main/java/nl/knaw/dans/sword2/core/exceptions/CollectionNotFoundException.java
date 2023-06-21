@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class CollectionNotFoundException extends Throwable {
+public class CollectionNotFoundException extends Exception {
     public CollectionNotFoundException(String msg) {
         super(msg);
     }

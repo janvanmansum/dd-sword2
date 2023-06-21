@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class HashMismatchException extends Throwable {
+public class HashMismatchException extends Exception {
     public HashMismatchException(String msg) {
         super(msg);
     }

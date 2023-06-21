@@ -15,6 +15,8 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
+import nl.knaw.dans.sword2.core.exceptions.InvalidDepositException;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 public interface ZipService {
 
-    void extractZipFileWithFileMapping(Path zipFile, Path targetPath, Map<String, String> fileMapping) throws IOException;
+    void extractZipFileWithFileMapping(Path zipFile, Path targetPath, Map<String, String> fileMapping) throws IOException, InvalidDepositException;
 
     List<String> getFilesInZip(Path zipFile) throws IOException;
 

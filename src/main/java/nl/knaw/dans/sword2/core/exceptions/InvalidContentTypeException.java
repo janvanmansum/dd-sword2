@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class InvalidContentTypeException extends Throwable {
+public class InvalidContentTypeException extends Exception {
     public InvalidContentTypeException(String msg) {
         super(msg);
     }

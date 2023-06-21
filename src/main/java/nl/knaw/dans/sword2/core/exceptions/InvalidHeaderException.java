@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class InvalidHeaderException extends Throwable {
+public class InvalidHeaderException extends Exception {
     public InvalidHeaderException(String msg) {
         super(msg);
     }

@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.exceptions;
 
-public class InvalidContentDispositionException extends Throwable {
+public class InvalidContentDispositionException extends Exception {
     public InvalidContentDispositionException(String msg) {
         super(msg);
     }

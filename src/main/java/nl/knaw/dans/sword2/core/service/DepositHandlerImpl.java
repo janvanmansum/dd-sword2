@@ -236,7 +236,7 @@ public class DepositHandlerImpl implements DepositHandler {
 
                             return deposit;
                         }
-                        catch (Exception | InvalidDepositException e) {
+                        catch (Exception e) {
                             log.error("Unable to open deposit from path {}", path, e);
                         }
 
