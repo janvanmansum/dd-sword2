@@ -21,6 +21,12 @@ authorization:
       filepathMapping: true
       collections:
         - collection1
+    - name: '*'
+      filepathMapping: true
+      collections:
+        - collection1
+
+
 
 sword2:
   baseUrl: 'http://localhost:20320/'
