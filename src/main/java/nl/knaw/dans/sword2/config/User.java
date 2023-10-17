@@ -15,15 +15,22 @@
  */
 package nl.knaw.dans.sword2.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class AuthorizationConfig {
-    @Valid
-    private PasswordDelegateConfig passwordDelegate;
-    @Valid
-    private List<UserConfig> users;
+@AllArgsConstructor // Necessary for the test
+@NoArgsConstructor
+public class UserConfig {
+    @NotEmpty
+    private String name;
+    private String passwordHash;
+    private Boolean filepathMapping;
+    @NotNull
+    private List<String> collections;
 }
