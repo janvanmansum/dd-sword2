@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
-import nl.knaw.dans.sword2.config.SwordError;
+import nl.knaw.dans.sword2.core.SwordError;
 import nl.knaw.dans.sword2.api.error.Error;
 import nl.knaw.dans.sword2.api.error.Generator;
 

@@ -19,7 +19,7 @@ import nl.knaw.dans.sword2.core.Deposit;
 import nl.knaw.dans.sword2.core.DepositState;
 import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.config.CollectionConfig;
-import nl.knaw.dans.sword2.config.UriRegistry;
+import nl.knaw.dans.sword2.core.UriRegistry;
 import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositNotFoundException;
 import nl.knaw.dans.sword2.core.exceptions.DepositReadOnlyException;
