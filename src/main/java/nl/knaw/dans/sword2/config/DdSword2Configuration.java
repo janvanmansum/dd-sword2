@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 public class DdSword2Configuration extends Configuration {
 
     @Valid
-    private UserConfig userConfig;
+    private UserSettings userSettings;
 
     @Valid
     @NotNull

@@ -13,7 +13,7 @@ server:
   requestLog:
     appenders: []
 
-userConfig:
+userSettings:
   default:
     passwordDelegate:
       url: http://localhost:20000/

@@ -8,25 +8,52 @@ server:
     - type: http
       port: 20321
 
-authorization:
-  passwordDelegate:
-    url: http://dar.dans.knaw.nl:20340/
-    forwardHeaders:
-      - authorization
-      - x-dataverse-key
+#
+# Settings that depend on the user account that is used to send deposits to dd-sword2.
+#
+userSettings:
+  #
+  # Settings used for users that have no user-specific settings in the 'users' section below.
+  #
+  default:
+    passwordDelegate:
+      url: http://dev.archaeology.datastations.nl:20340/
+      forwardHeaders:
+        - Authorization
+        - X-Dataverse-key
+
+    # Collections that this user is allowed to send deposits to
+    collections:
+      - collection1
+    # If true, the payload files of received bags will be renamed on extraction. The new name will be a newly created UUID. The mapping to the original path + name (filepath)
+    # is kept in the file original-filepaths.txt in the root of the bag. This file has lines in with the following lay-out
+    #
+    # <new filepath>  <original filepath>
+    #
+    # for example:
+    #
+    # data/5c08c155-a986-4833-b465-ab31a12288ae  data/path/to/original/file.txt
+    #
+    filepathMapping: true
+
+  #
+  # Settings for specific users.
+  #
   users:
-    - name: 'user001'
-      # or
-      # passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y' # user001
-      filepathMapping: true
-      collections:
-        - collection1
-    - name: '*'
-      filepathMapping: true
+    #
+    # Example user
+    #
+    - name: user001
+
+      # The password of the user can be configured here. If this field is absent the password will be retrieved from the passwordDelegate configured in the
+      # default section above.
+      # BCrypt encrypted password (set to the string 'user001')
+      #passwordHash: $2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y
+
       collections:
         - collection1
 
-
+      filepathMapping: true
 
 sword2:
   baseUrl: 'http://localhost:20320/'

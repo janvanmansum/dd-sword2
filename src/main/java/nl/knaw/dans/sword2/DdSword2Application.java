@@ -87,7 +87,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         var errorResponseFactory = new ErrorResponseFactoryImpl();
 
         var bagItManager = new BagItManagerImpl(fileService, checksumCalculator);
-        var userManager = new UserManagerImpl(configuration.getUserConfig().getUsers());
+        var userManager = new UserManagerImpl(configuration.getUserSettings().getUsers());
 
         var finalizingExecutor = configuration.getSword2().getFinalizingQueue().build(environment);
         var rescheduleExecutor = configuration.getSword2().getRescheduleQueue().build(environment);
@@ -115,14 +115,14 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         environment.jersey().register(HashHeaderInterceptor.class);
 
         AuthenticationService dataverseAuthenticator = null;
-        if (configuration.getUserConfig().getDefaultConfig().getPasswordDelegate() != null) {
-            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getUserConfig().getDefaultConfig().getPasswordDelegate(), httpClient, environment.getObjectMapper());
+        if (configuration.getUserSettings().getDefaultConfig().getPasswordDelegate() != null) {
+            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getUserSettings().getDefaultConfig().getPasswordDelegate(), httpClient, environment.getObjectMapper());
         }
 
         environment.jersey().register(new AuthDynamicFeature(
             new HeaderAuthenticationFilter.Builder<Depositor>()
                 .setRealm("Dataverse")
-                .setAuthenticator(new SwordAuthenticator(configuration.getUserConfig().getUsers(), dataverseAuthenticator))
+                .setAuthenticator(new SwordAuthenticator(configuration.getUserSettings().getUsers(), dataverseAuthenticator))
                 .buildAuthFilter()
         ));
 

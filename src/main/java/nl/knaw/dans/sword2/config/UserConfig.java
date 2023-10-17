@@ -15,17 +15,22 @@
  */
 package nl.knaw.dans.sword2.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
+@AllArgsConstructor // Necessary for the test
+@NoArgsConstructor
 public class UserConfig {
-    @JsonProperty("default")
-    private DefaultUserConfig defaultConfig;
-
-    @Valid
-    private List<User> users;
+    @NotEmpty
+    private String name;
+    private String passwordHash;
+    private Boolean filepathMapping;
+    @NotNull
+    private List<String> collections;
 }
