@@ -16,7 +16,7 @@
 package nl.knaw.dans.sword2.core.service;
 
 import nl.knaw.dans.sword2.core.auth.Depositor;
-import nl.knaw.dans.sword2.config.UserConfig;
+import nl.knaw.dans.sword2.config.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.Set;
 public class UserManagerImpl implements UserManager {
     private final Map<String, Depositor> depositorMap = new HashMap<>();
 
-    public UserManagerImpl(List<UserConfig> users) {
+    public UserManagerImpl(List<User> users) {
         for (var user: users) {
             var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
             depositorMap.put(user.getName(), depositor);

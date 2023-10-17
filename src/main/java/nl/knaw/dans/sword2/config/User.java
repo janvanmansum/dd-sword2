@@ -26,7 +26,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor // Necessary for the test
 @NoArgsConstructor
-public class UserConfig {
+public class User {
     @NotEmpty
     private String name;
     private String passwordHash;

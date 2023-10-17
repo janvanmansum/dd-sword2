@@ -17,13 +17,13 @@ package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
-import nl.knaw.dans.sword2.config.AuthorizationConfig;
-import nl.knaw.dans.sword2.config.UserConfig;
+import nl.knaw.dans.sword2.config.User;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,12 +31,12 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
 
     private static final Logger log = LoggerFactory.getLogger(SwordAuthenticator.class);
 
-    private final AuthorizationConfig authorizationConfig;
+    private final List<User> users;
 
     private final AuthenticationService authenticationService;
 
-    public SwordAuthenticator(AuthorizationConfig authorizationConfig, AuthenticationService authenticationService) {
-        this.authorizationConfig = authorizationConfig;
+    public SwordAuthenticator(List<User> users, AuthenticationService authenticationService) {
+        this.users = users;
         this.authenticationService = authenticationService;
     }
 
@@ -87,8 +87,8 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
         return depositor;
     }
 
-    Optional<UserConfig> getUserByName(String name) {
-        return authorizationConfig.getUsers().stream()
+    Optional<User> getUserByName(String name) {
+        return users.stream()
             .filter(u -> u.getName().equals(name))
             .findFirst();
     }

@@ -16,12 +16,9 @@
 
 package nl.knaw.dans.sword2.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
 import lombok.Data;
-import nl.knaw.dans.sword2.config.AuthorizationConfig;
-import nl.knaw.dans.sword2.config.Sword2Config;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -30,7 +27,7 @@ import javax.validation.constraints.NotNull;
 public class DdSword2Configuration extends Configuration {
 
     @Valid
-    private AuthorizationConfig authorization;
+    private UserConfig userConfig;
 
     @Valid
     @NotNull
