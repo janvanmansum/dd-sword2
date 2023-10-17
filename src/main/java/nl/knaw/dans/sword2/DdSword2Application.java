@@ -122,7 +122,8 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         environment.jersey().register(new AuthDynamicFeature(
             new HeaderAuthenticationFilter.Builder<Depositor>()
                 .setRealm("Dataverse")
-                .setAuthenticator(new SwordAuthenticator(configuration.getUserSettings().getUsers(), dataverseAuthenticator))
+                .setAuthenticator(new SwordAuthenticator(configuration.getUserSettings().getUsers(),
+                    configuration.getUserSettings().getDefaultConfig(), dataverseAuthenticator))
                 .buildAuthFilter()
         ));
 

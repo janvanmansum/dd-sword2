@@ -27,5 +27,5 @@ public class DefaultUserConfig {
     private PasswordDelegateConfig passwordDelegate;
     @NotEmpty
     private List<String> collections;
-    private boolean filepathMapping;
+    private Boolean filepathMapping;
 }

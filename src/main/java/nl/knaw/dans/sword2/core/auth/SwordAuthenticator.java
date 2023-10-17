@@ -17,6 +17,7 @@ package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
+import nl.knaw.dans.sword2.config.DefaultUserConfig;
 import nl.knaw.dans.sword2.config.UserConfig;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
@@ -33,23 +34,28 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
 
     private final List<UserConfig> userConfigs;
 
+    private final DefaultUserConfig defaultUserConfig;
+
     private final AuthenticationService authenticationService;
 
-    public SwordAuthenticator(List<UserConfig> userConfigs, AuthenticationService authenticationService) {
+    public SwordAuthenticator(List<UserConfig> userConfigs, DefaultUserConfig defaultUserConfig, AuthenticationService authenticationService) {
         this.userConfigs = userConfigs;
+        this.defaultUserConfig = defaultUserConfig;
         this.authenticationService = authenticationService;
     }
 
     @Override
     public Optional<Depositor> authenticate(HeaderCredentials credentials) throws AuthenticationException {
         Optional<Depositor> depositor = Optional.empty();
+        String userName;
         var basicCredentials = credentials.getBasicCredentials();
         if (basicCredentials != null) {
             log.debug("Basic credentials found, checking if user is configured locally");
-            var user = getUserByName(basicCredentials.getUsername());
+            var optUserConfig = getUserConfigByName(basicCredentials.getUsername());
 
-            if (user.isPresent()) {
-                var userConfig = user.get();
+            if (optUserConfig.isPresent()) {
+                log.debug("User specific config found");
+                var userConfig = optUserConfig.get();
                 if (userConfig.getPasswordHash() != null) {
                     log.debug("User is configured with a password hash, validating password for user {}", userConfig.getName());
 
@@ -59,35 +65,38 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
                 }
                 else {
                     log.debug("User is not configured with a password hash, forwarding request to passwordDelegate");
-                    depositor = delegateAuthentication(credentials);
+                    userName = delegateAuthentication(credentials);
+                    if (userConfig.getName().equals(userName)) {
+                        depositor = Optional.of(new Depositor(userConfig.getName(), userConfig.getFilepathMapping(), Set.copyOf(userConfig.getCollections())));
+                    }
+                    else {
+                        depositor = Optional.empty();
+                    }
                 }
             }
             else {
-                log.debug("User is not found in config file and therefore not allowed to deposit");
+                log.debug("User is not found in config file; using delegate and default user config by default");
+                userName = delegateAuthentication(credentials);
+                depositor = Optional.ofNullable(userName).map(u -> new Depositor(u, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
             }
         }
         else {
             log.debug("No basic credentials provided, forwarding request to passwordDelegate");
-            depositor = delegateAuthentication(credentials);
+            userName = delegateAuthentication(credentials);
+            depositor = Optional.of(new Depositor(userName, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
         }
 
         return depositor;
     }
 
-    private Optional<Depositor> delegateAuthentication(HeaderCredentials credentials) throws AuthenticationException {
-        Optional<Depositor> depositor = Optional.empty();
+    private String delegateAuthentication(HeaderCredentials credentials) throws AuthenticationException {
         if (authenticationService != null) {
-            log.debug("No basic credentials provided, or not configured with a local password; forwarding request to passwordDelegate");
-
-            depositor = authenticationService.authenticateWithHeaders(credentials.getHeaders())
-                .map(this::getUserByName)
-                .flatMap(f -> f)
-                .map(u -> new Depositor(u.getName(), u.getFilepathMapping(), new HashSet<>(u.getCollections())));
+            return authenticationService.authenticateWithHeaders(credentials.getHeaders()).orElse(null);
         }
-        return depositor;
+        return null;
     }
 
-    Optional<UserConfig> getUserByName(String name) {
+    Optional<UserConfig> getUserConfigByName(String name) {
         return userConfigs.stream()
             .filter(u -> u.getName().equals(name))
             .findFirst();

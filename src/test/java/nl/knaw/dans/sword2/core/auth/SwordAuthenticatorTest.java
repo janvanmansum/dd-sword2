@@ -16,6 +16,7 @@
 package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
+import nl.knaw.dans.sword2.config.DefaultUserConfig;
 import nl.knaw.dans.sword2.config.PasswordDelegateConfig;
 import nl.knaw.dans.sword2.config.UserConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +55,10 @@ class SwordAuthenticatorTest {
         var delegate = new PasswordDelegateConfig();
         delegate.setForwardHeaders(List.of("x-dataverse-key", "authorization"));
         delegate.setUrl(passwordDelegate);
-        return new SwordAuthenticator(userConfigs, authenticationService);
+        var defaultUserConfig = new DefaultUserConfig();
+        defaultUserConfig.setPasswordDelegate(delegate);
+        defaultUserConfig.setCollections(Collections.emptyList());
+        return new SwordAuthenticator(userConfigs, defaultUserConfig, authenticationService);
     }
 
     HeaderCredentials buildCredentials(String username, String password, String header) {
