@@ -16,8 +16,12 @@
 package nl.knaw.dans.sword2.config;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import nl.knaw.dans.sword2.core.DepositState;
 import nl.knaw.dans.sword2.config.converter.StringByteSizeConverter;
+import org.checkerframework.checker.units.qual.N;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -26,6 +30,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CollectionConfig {
     @NotEmpty
     private String name;
@@ -39,88 +46,7 @@ public class CollectionConfig {
     @NotNull
     @JsonDeserialize(converter = StringByteSizeConverter.class)
     private long diskSpaceMargin;
+    @NotNull
     private List<Path> depositTrackingPath = new ArrayList<>();
     private List<DepositState> autoClean = new ArrayList<>();
-
-    public CollectionConfig() {
-
-    }
-
-    public CollectionConfig(String name, String path, Path uploads, Path deposits, long diskSpaceMargin, List<DepositState> autoClean) {
-        this.name = name;
-        this.path = path;
-        this.uploads = uploads;
-        this.deposits = deposits;
-        this.diskSpaceMargin = diskSpaceMargin;
-        this.autoClean = autoClean;
-    }
-
-    public List<Path> getDepositTrackingPath() {
-        return depositTrackingPath;
-    }
-
-    public void setDepositTrackingPath(List<Path> depositTrackingPath) {
-        this.depositTrackingPath = depositTrackingPath;
-    }
-
-    public long getDiskSpaceMargin() {
-        return diskSpaceMargin;
-    }
-
-    public void setDiskSpaceMargin(long diskSpaceMargin) {
-        this.diskSpaceMargin = diskSpaceMargin;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public Path getUploads() {
-        return uploads;
-    }
-
-    public void setUploads(Path uploads) {
-        this.uploads = uploads;
-    }
-
-    public Path getDeposits() {
-        return deposits;
-    }
-
-    public void setDeposits(Path deposits) {
-        this.deposits = deposits;
-    }
-
-    public List<DepositState> getAutoClean() {
-        return autoClean;
-    }
-
-    public void setAutoClean(List<DepositState> autoClean) {
-        this.autoClean = autoClean;
-    }
-
-    @Override
-    public String toString() {
-        return "CollectionConfig{" +
-            "name='" + name + '\'' +
-            ", path='" + path + '\'' +
-            ", uploads=" + uploads +
-            ", deposits=" + deposits +
-            ", diskSpaceMargin=" + diskSpaceMargin +
-            ", depositTrackingPath=" + depositTrackingPath +
-            ", autoClean=" + autoClean +
-            '}';
-    }
 }

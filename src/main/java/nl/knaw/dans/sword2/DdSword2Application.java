@@ -106,7 +106,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
 
         var depositFinalizerManager = new DepositFinalizerManager(finalizingExecutor, depositHandler, queue, rescheduleExecutor, configuration.getSword2().getRescheduleDelay());
 
-        var httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration())
+        var httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClient())
             .build(getName());
 
         environment.jersey().register(MultiPartFeature.class);
@@ -115,8 +115,8 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         environment.jersey().register(HashHeaderInterceptor.class);
 
         AuthenticationService dataverseAuthenticator = null;
-        if (configuration.getAuthorization().getPasswordDelegateConfig() != null) {
-            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getAuthorization().getPasswordDelegateConfig(), httpClient, environment.getObjectMapper());
+        if (configuration.getAuthorization().getPasswordDelegate() != null) {
+            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getAuthorization().getPasswordDelegate(), httpClient, environment.getObjectMapper());
         }
 
         environment.jersey().register(new AuthDynamicFeature(

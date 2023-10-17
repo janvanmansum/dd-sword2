@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.sword2.config;
 
+import lombok.Data;
 import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 
 import javax.validation.Valid;
@@ -25,16 +26,16 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 
+@Data
 public class Sword2Config {
 
-    @Valid
     @NotNull
     private URI baseUrl;
     @Email
     @NotEmpty
     private String emailAddress;
     @NotEmpty
-    private List<@Valid  CollectionConfig> collections;
+    private List<@Valid CollectionConfig> collections;
     @Valid
     @NotNull
     private Duration rescheduleDelay;
@@ -44,64 +45,6 @@ public class Sword2Config {
     @Valid
     @NotNull
     private ExecutorServiceFactory rescheduleQueue;
-
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public ExecutorServiceFactory getRescheduleQueue() {
-        return rescheduleQueue;
-    }
-
-    public void setRescheduleQueue(ExecutorServiceFactory rescheduleQueue) {
-        this.rescheduleQueue = rescheduleQueue;
-    }
-
-    public URI getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(URI baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    public List<CollectionConfig> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<CollectionConfig> collections) {
-        this.collections = collections;
-    }
-
-    public Duration getRescheduleDelay() {
-        return rescheduleDelay;
-    }
-
-    public void setRescheduleDelay(Duration rescheduleDelay) {
-        this.rescheduleDelay = rescheduleDelay;
-    }
-
-    public ExecutorServiceFactory getFinalizingQueue() {
-        return finalizingQueue;
-    }
-
-    public void setFinalizingQueue(ExecutorServiceFactory finalizingQueue) {
-        this.finalizingQueue = finalizingQueue;
-    }
-
-    @Override
-    public String toString() {
-        return "Sword2Config{" +
-            "baseUrl=" + baseUrl +
-            ", collections=" + collections +
-            ", rescheduleDelay=" + rescheduleDelay +
-            ", finalizingQueue=" + finalizingQueue +
-            '}';
-    }
 }
 
 

@@ -15,40 +15,17 @@
  */
 package nl.knaw.dans.sword2.config;
 
-import javax.validation.Valid;
+import lombok.Data;
+
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.net.URL;
 import java.util.List;
 
+@Data
 public class PasswordDelegateConfig {
-
-    @Valid
+    @NotNull
     private URL url;
-    @Valid
     @NotEmpty
     private List<String> forwardHeaders;
-
-    public URL getUrl() {
-        return url;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    public List<String> getForwardHeaders() {
-        return forwardHeaders;
-    }
-
-    public void setForwardHeaders(List<String> forwardHeaders) {
-        this.forwardHeaders = forwardHeaders;
-    }
-
-    @Override
-    public String toString() {
-        return "PasswordDelegateConfig{" +
-            "passwordDelegate=" + url +
-            ", forwardHeaders=" + forwardHeaders +
-            '}';
-    }
 }

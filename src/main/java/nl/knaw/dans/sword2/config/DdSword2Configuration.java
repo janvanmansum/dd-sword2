@@ -19,12 +19,14 @@ package nl.knaw.dans.sword2.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
+import lombok.Data;
 import nl.knaw.dans.sword2.config.AuthorizationConfig;
 import nl.knaw.dans.sword2.config.Sword2Config;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+@Data
 public class DdSword2Configuration extends Configuration {
 
     @Valid
@@ -36,30 +38,4 @@ public class DdSword2Configuration extends Configuration {
     @Valid
     @NotNull
     private HttpClientConfiguration httpClient = new HttpClientConfiguration();
-
-    public Sword2Config getSword2() {
-        return sword2;
-    }
-
-    public void setSword2(Sword2Config sword2) {
-        this.sword2 = sword2;
-    }
-
-    @JsonProperty("httpClient")
-    public HttpClientConfiguration getHttpClientConfiguration() {
-        return httpClient;
-    }
-
-    @JsonProperty("httpClient")
-    public void setHttpClientConfiguration(HttpClientConfiguration httpClient) {
-        this.httpClient = httpClient;
-    }
-
-    public AuthorizationConfig getAuthorization() {
-        return authorization;
-    }
-
-    public void setAuthorization(AuthorizationConfig authorization) {
-        this.authorization = authorization;
-    }
 }

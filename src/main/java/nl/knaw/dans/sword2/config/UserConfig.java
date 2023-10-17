@@ -15,66 +15,22 @@
  */
 package nl.knaw.dans.sword2.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Data
+@AllArgsConstructor // Necessary for the test
+@NoArgsConstructor
 public class UserConfig {
     @NotEmpty
     private String name;
     private String passwordHash;
     private Boolean filepathMapping;
-    @NotEmpty
+    @NotNull
     private List<String> collections;
-
-    public UserConfig() {
-
-    }
-
-    public UserConfig(String name, String passwordHash, Boolean filepathMapping, List<String> collections) {
-        this.name = name;
-        this.passwordHash = passwordHash;
-        this.filepathMapping = filepathMapping;
-        this.collections = collections;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public Boolean getFilepathMapping() {
-        return filepathMapping;
-    }
-
-    public void setFilepathMapping(Boolean filepathMapping) {
-        this.filepathMapping = filepathMapping;
-    }
-
-    public List<String> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<String> collections) {
-        this.collections = collections;
-    }
-
-    @Override
-    public String toString() {
-        return "UserConfig{" +
-            "name='" + name + '\'' +
-            ", filepathMapping=" + filepathMapping +
-            ", collections=" + collections +
-            '}';
-    }
 }

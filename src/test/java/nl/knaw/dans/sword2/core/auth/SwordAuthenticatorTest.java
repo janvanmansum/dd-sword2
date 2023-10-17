@@ -57,7 +57,7 @@ class SwordAuthenticatorTest {
 
         var config = new AuthorizationConfig();
         config.setUsers(users);
-        config.setPasswordDelegateConfig(delegate);
+        config.setPasswordDelegate(delegate);
 
         return new SwordAuthenticator(config, authenticationService);
     }

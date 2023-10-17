@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,8 +31,8 @@ class FileSystemPermissionHealthCheckTest {
 
     @Test
     void checkEverythingWorks() throws Exception {
-        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100, List.of(DepositState.INVALID));
-        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, List.of(DepositState.INVALID));
+        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100, Collections.emptyList(), List.of(DepositState.INVALID));
+        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, Collections.emptyList(), List.of(DepositState.INVALID));
         var collections = List.of(collection1, collection2);
         var fileService = Mockito.mock(FileService.class);
 
@@ -44,8 +45,8 @@ class FileSystemPermissionHealthCheckTest {
 
     @Test
     void checkEverythingWorksExceptForOnePath() throws Exception {
-        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100, List.of(DepositState.INVALID));
-        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, List.of(DepositState.INVALID));
+        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100, Collections.emptyList(),List.of(DepositState.INVALID));
+        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, Collections.emptyList(),List.of(DepositState.INVALID));
         var collections = List.of(collection1, collection2);
         var fileService = Mockito.mock(FileService.class);
 
@@ -65,8 +66,8 @@ class FileSystemPermissionHealthCheckTest {
 
     @Test
     void checkEverythingWorksExceptForOnePathUploads() throws Exception {
-        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100, List.of(DepositState.INVALID));
-        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, List.of(DepositState.INVALID));
+        var collection1 = new CollectionConfig("name", "path", Path.of("uploads"), Path.of("deposits"), 100,Collections.emptyList(),List.of(DepositState.INVALID));
+        var collection2 = new CollectionConfig("name2", "path2", Path.of("uploads2"), Path.of("deposits2"), 100, Collections.emptyList(),List.of(DepositState.INVALID));
         var collections = List.of(collection1, collection2);
         var fileService = Mockito.mock(FileService.class);
 

@@ -15,40 +15,15 @@
  */
 package nl.knaw.dans.sword2.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import javax.validation.Valid;
 import java.util.List;
 
+@Data
 public class AuthorizationConfig {
-
     @Valid
-    @JsonProperty("passwordDelegate")
-    private PasswordDelegateConfig passwordDelegateConfig;
+    private PasswordDelegateConfig passwordDelegate;
     @Valid
     private List<UserConfig> users;
-
-    public List<UserConfig> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<UserConfig> users) {
-        this.users = users;
-    }
-
-    @Override
-    public String toString() {
-        return "AuthorizationConfig{" +
-            "passwordDelegateConfig=" + passwordDelegateConfig +
-            ", users=" + users +
-            '}';
-    }
-
-    public PasswordDelegateConfig getPasswordDelegateConfig() {
-        return passwordDelegateConfig;
-    }
-
-    public void setPasswordDelegateConfig(PasswordDelegateConfig passwordDelegateConfig) {
-        this.passwordDelegateConfig = passwordDelegateConfig;
-    }
 }
