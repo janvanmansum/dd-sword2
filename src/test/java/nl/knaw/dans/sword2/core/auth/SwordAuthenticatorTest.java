@@ -16,9 +16,9 @@
 package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
-import nl.knaw.dans.sword2.core.config.AuthorizationConfig;
-import nl.knaw.dans.sword2.core.config.PasswordDelegateConfig;
-import nl.knaw.dans.sword2.core.config.UserConfig;
+import nl.knaw.dans.sword2.config.AuthorizationConfig;
+import nl.knaw.dans.sword2.config.PasswordDelegateConfig;
+import nl.knaw.dans.sword2.config.UserConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;

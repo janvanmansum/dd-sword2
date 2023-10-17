@@ -15,8 +15,8 @@
  */
 package nl.knaw.dans.sword2.resources;
 
-import nl.knaw.dans.sword2.core.config.SwordError;
-import nl.knaw.dans.sword2.core.config.UriRegistry;
+import nl.knaw.dans.sword2.config.SwordError;
+import nl.knaw.dans.sword2.config.UriRegistry;
 import nl.knaw.dans.sword2.core.exceptions.InvalidHeaderException;
 import nl.knaw.dans.sword2.core.service.ErrorResponseFactory;
 import org.apache.commons.fileupload.ParameterParser;

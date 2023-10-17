@@ -17,7 +17,7 @@ package nl.knaw.dans.sword2.core.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.auth.AuthenticationException;
-import nl.knaw.dans.sword2.core.config.PasswordDelegateConfig;
+import nl.knaw.dans.sword2.config.PasswordDelegateConfig;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;

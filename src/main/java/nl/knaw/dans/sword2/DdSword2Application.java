@@ -25,6 +25,7 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import nl.knaw.dans.sword2.config.DdSword2Configuration;
 import nl.knaw.dans.sword2.core.auth.AuthenticationService;
 import nl.knaw.dans.sword2.core.auth.AuthenticationServiceImpl;
 import nl.knaw.dans.sword2.core.auth.Depositor;

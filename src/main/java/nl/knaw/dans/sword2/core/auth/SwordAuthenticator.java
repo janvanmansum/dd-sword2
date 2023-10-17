@@ -17,8 +17,8 @@ package nl.knaw.dans.sword2.core.auth;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
-import nl.knaw.dans.sword2.core.config.AuthorizationConfig;
-import nl.knaw.dans.sword2.core.config.UserConfig;
+import nl.knaw.dans.sword2.config.AuthorizationConfig;
+import nl.knaw.dans.sword2.config.UserConfig;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

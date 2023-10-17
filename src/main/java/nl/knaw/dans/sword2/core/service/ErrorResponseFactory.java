@@ -16,7 +16,7 @@
 package nl.knaw.dans.sword2.core.service;
 
 import nl.knaw.dans.sword2.api.error.Error;
-import nl.knaw.dans.sword2.core.config.SwordError;
+import nl.knaw.dans.sword2.config.SwordError;
 
 public interface ErrorResponseFactory {
 

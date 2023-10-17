@@ -16,7 +16,7 @@
 
 package nl.knaw.dans.sword2.api.error;
 
-import nl.knaw.dans.sword2.core.config.SwordError;
+import nl.knaw.dans.sword2.config.SwordError;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

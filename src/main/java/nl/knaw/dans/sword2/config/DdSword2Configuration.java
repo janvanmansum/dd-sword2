@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.sword2;
+package nl.knaw.dans.sword2.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
-import nl.knaw.dans.sword2.core.config.AuthorizationConfig;
-import nl.knaw.dans.sword2.core.config.Sword2Config;
+import nl.knaw.dans.sword2.config.AuthorizationConfig;
+import nl.knaw.dans.sword2.config.Sword2Config;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
