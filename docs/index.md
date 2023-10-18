@@ -65,7 +65,9 @@ The service consumes the following interfaces.
 
 * _Protocol type_: HTTP Basic Auth
 * _Internal or external_: **internal**
-* _Purpose_: delegate basic auth authentication of a client for SWORD2
+* _Purpose_: delegate authentication of a client for SWORD2
+
+Authentication is discussed in more detail ot the [Authentication page](auth.md).
 
 ### Processing
 
