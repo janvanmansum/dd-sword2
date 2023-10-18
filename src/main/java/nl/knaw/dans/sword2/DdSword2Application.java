@@ -87,7 +87,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         var errorResponseFactory = new ErrorResponseFactoryImpl();
 
         var bagItManager = new BagItManagerImpl(fileService, checksumCalculator);
-        var userManager = new UserManagerImpl(configuration.getUserSettings().getUsers());
+        var userManager = new UserManagerImpl(configuration.getUserSettings().getUsers(), configuration.getUserSettings().getDefaultConfig());
 
         var finalizingExecutor = configuration.getSword2().getFinalizingQueue().build(environment);
         var rescheduleExecutor = configuration.getSword2().getRescheduleQueue().build(environment);
