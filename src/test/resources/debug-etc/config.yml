@@ -11,7 +11,7 @@ server:
 #
 # Settings that depend on the user account that is used to send deposits to dd-sword2.
 #
-userSettings:
+userProfiles:
   #
   # Settings used for users that have no user-specific settings in the 'users' section below.
   #

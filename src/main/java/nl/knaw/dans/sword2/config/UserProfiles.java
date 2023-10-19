@@ -22,9 +22,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Data
-public class UserSettings {
+public class UserProfiles {
     @JsonProperty("default")
-    private DefaultUserConfig defaultConfig;
+    private DefaultUserConfig defaultUserConfig;
 
     @Valid
     private List<UserConfig> users;

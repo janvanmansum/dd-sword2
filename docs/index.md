@@ -67,7 +67,7 @@ The service consumes the following interfaces.
 * _Internal or external_: **internal**
 * _Purpose_: delegate authentication of a client for SWORD2
 
-Authentication is discussed in more detail ot the [Authentication page](auth.md).
+Authentication is discussed in more detail ot the [User profiles & authentication page](auth.md).
 
 ### Processing
 
