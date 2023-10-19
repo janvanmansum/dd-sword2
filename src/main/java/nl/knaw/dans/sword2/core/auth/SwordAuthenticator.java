@@ -47,7 +47,7 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
     @Override
     public Optional<Depositor> authenticate(HeaderCredentials credentials) throws AuthenticationException {
         Optional<Depositor> depositor = Optional.empty();
-        String userName;
+        Optional<String> userName;
         var basicCredentials = credentials.getBasicCredentials();
         if (basicCredentials != null) {
             log.debug("Basic credentials found, checking if user is configured locally");
@@ -66,7 +66,7 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
                 else {
                     log.debug("User is not configured with a password hash, forwarding request to passwordDelegate");
                     userName = delegateAuthentication(credentials);
-                    if (userConfig.getName().equals(userName)) {
+                    if (userName.isPresent() && userConfig.getName().equals(userName.get())) {
                         depositor = Optional.of(new Depositor(userConfig.getName(), userConfig.getFilepathMapping(), Set.copyOf(userConfig.getCollections())));
                     }
                     else {
@@ -77,23 +77,25 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
             else {
                 log.debug("User is not found in config file; using delegate and default user config by default");
                 userName = delegateAuthentication(credentials);
-                depositor = Optional.ofNullable(userName).map(u -> new Depositor(u, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
+                depositor = userName
+                    .map(u -> new Depositor(u, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
             }
         }
         else {
             log.debug("No basic credentials provided, forwarding request to passwordDelegate");
             userName = delegateAuthentication(credentials);
-            depositor = Optional.of(new Depositor(userName, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
+            depositor = userName
+                .map(u -> new Depositor(u, defaultUserConfig.getFilepathMapping(), new HashSet<>(defaultUserConfig.getCollections())));
         }
 
         return depositor;
     }
 
-    private String delegateAuthentication(HeaderCredentials credentials) throws AuthenticationException {
+    private Optional<String> delegateAuthentication(HeaderCredentials credentials) throws AuthenticationException {
         if (authenticationService != null) {
-            return authenticationService.authenticateWithHeaders(credentials.getHeaders()).orElse(null);
+            return authenticationService.authenticateWithHeaders(credentials.getHeaders());
         }
-        return null;
+        return Optional.empty();
     }
 
     Optional<UserConfig> getUserConfigByName(String name) {
