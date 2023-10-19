@@ -30,9 +30,11 @@ public class UserManagerImpl implements UserManager {
     private final DefaultUserConfig defaultUserConfig;
 
     public UserManagerImpl(List<UserConfig> userConfigs, DefaultUserConfig defaultUserConfig) {
-        for (var user : userConfigs) {
-            var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
-            depositorMap.put(user.getName(), depositor);
+        if (userConfigs != null) {
+            for (var user : userConfigs) {
+                var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
+                depositorMap.put(user.getName(), depositor);
+            }
         }
         this.defaultUserConfig = defaultUserConfig;
     }

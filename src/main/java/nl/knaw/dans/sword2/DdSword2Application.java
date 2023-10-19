@@ -115,7 +115,8 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         environment.jersey().register(HashHeaderInterceptor.class);
 
         AuthenticationService dataverseAuthenticator = null;
-        if (configuration.getUserProfiles().getDefaultUserConfig().getPasswordDelegate() != null) {
+        var defaultUserConfig = configuration.getUserProfiles().getDefaultUserConfig();
+        if (defaultUserConfig != null && defaultUserConfig.getPasswordDelegate() != null) {
             dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getUserProfiles().getDefaultUserConfig().getPasswordDelegate(), httpClient, environment.getObjectMapper());
         }
 
