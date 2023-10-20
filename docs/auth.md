@@ -45,11 +45,11 @@ The `dd-sword2` service can be configured to authenticate users in the following
 
 ### Some example scenarios:
 
-| Scenario                                                       | How to configure                                                                                                                                                                                  |
-|----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Only users with a profile can deposit data.                    | Configure the users in `userProfiles.users` with a `passwordHash` and leave out `userProfiles.default.passwordDelegate` or set it to `null`                                                       |
-| All users can deposit data and share a single profile          | Configure the `userProfiles.default` section and include `passwordDelegate` to the system that authenticates the users; leave `userProfiles.users` null or empty                                  |
-| All users can deposit data, some users need different settings | Configure the `userProfiles.default` section and include `passwordDelegate` to the system that authenticates the users; configure the other users in `userProfiles.users` with their own settings | 
+| Scenario                                                       | How to configure                                                                                                                                                                                                           |
+|----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Only users with a profile can deposit data.                    | Configure the users in <br/> `userProfiles.users` with a  <br/>`passwordHash` and leave out <br/> `userProfiles.default.passwordDelegate`<br/> or set it to `null`                                                         |
+| All users can deposit data and share a single profile          | Configure the <br/>`userProfiles.default` section and<br/> include `passwordDelegate` to the system<br/> that authenticates the users; leave<br/> `userProfiles.users` null or empty                                       |
+| All users can deposit data, some users need different settings | Configure the `userProfiles.default`<br/> section and include `passwordDelegate`<br/> to the system that authenticates <br/>the users; configure the other users in <br/>`userProfiles.users` with their own<br/> settings | 
 
 Authentication process
 ----------------------
