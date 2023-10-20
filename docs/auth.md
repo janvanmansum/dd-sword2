@@ -43,6 +43,14 @@ The `dd-sword2` service can be configured to authenticate users in the following
                - collection1
                filepathMapping: true
 
+### Some example scenarios:
+
+| Scenario                                                       | How to configure                                                                                                                                                                                  |
+|----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Only users with a profile can deposit data.                    | Configure the users in `userProfiles.users` with a `passwordHash` and leave out `userProfiles.default.passwordDelegate` or set it to `null`                                                       |
+| All users can deposit data and share a single profile          | Configure the `userProfiles.default` section and include `passwordDelegate` to the system that authenticates the users; leave `userProfiles.users` null or empty                                  |
+| All users can deposit data, some users need different settings | Configure the `userProfiles.default` section and include `passwordDelegate` to the system that authenticates the users; configure the other users in `userProfiles.users` with their own settings | 
+
 Authentication process
 ----------------------
 The `dd-sword2` service uses the following process to authenticate a user:
@@ -51,7 +59,7 @@ The `dd-sword2` service uses the following process to authenticate a user:
     * If the username in the credential corresponds with a profile that has a `passwordHash`, validate the password againt the
       hash.
     * Otherwise:
-        * If a default profile with a `passwordDelegate` is configured: delegate authentication to the remote service. 
+        * If a default profile with a `passwordDelegate` is configured: delegate authentication to the remote service.
         * Return a `401 Unauthorized` response.
 * If no basic authentication credentials are found in the request:
     * If a default profile with a `passwordDelegate` is configured: delegate authentication to the remote service.

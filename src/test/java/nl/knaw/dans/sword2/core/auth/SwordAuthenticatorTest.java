@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,7 +52,7 @@ class SwordAuthenticatorTest {
         Mockito.reset(authenticationService);
     }
 
-    SwordAuthenticator getAuthenticator(List<UserConfig> userConfigs) {
+    private SwordAuthenticator getAuthenticator(List<UserConfig> userConfigs) {
         var delegate = new PasswordDelegateConfig();
         delegate.setForwardHeaders(List.of("x-dataverse-key", "authorization"));
         delegate.setUrl(passwordDelegate);
@@ -61,7 +62,7 @@ class SwordAuthenticatorTest {
         return new SwordAuthenticator(userConfigs, defaultUserConfig, authenticationService);
     }
 
-    HeaderCredentials buildCredentials(String username, String password, String header) {
+    private HeaderCredentials buildCredentials(String username, String password, String header) {
         var headers = new MultivaluedHashMap<String, String>();
 
         if (header != null) {
@@ -78,7 +79,7 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void authenticate_should_return_empty_optional_if_no_users_are_configured() {
+    public void authenticate_should_return_empty_optional_if_no_users_are_configured() {
         var result = assertDoesNotThrow(() ->
             getAuthenticator(List.of()).authenticate(
                 buildCredentials("user", "password", null)
@@ -88,58 +89,102 @@ class SwordAuthenticatorTest {
     }
 
     @Test
-    void authenticate_should_return_empty_optional_if_password_is_incorrect() throws AuthenticationException {
+    public void authenticate_should_return_empty_optional_if_password_is_incorrect() throws AuthenticationException {
         var password = BCrypt.hashpw("password", BCrypt.gensalt());
         var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>()));
 
-        assertTrue(getAuthenticator(userList).authenticate(
-            buildCredentials("user001", "different_password", null)
-        ).isEmpty());
+        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "incorrect_password", null));
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void authenticate_should_return_user_if_username_and_password_are_correct() throws AuthenticationException {
+    public void authenticate_should_return_user_if_username_and_password_are_correct() throws AuthenticationException {
         var password = BCrypt.hashpw("password", BCrypt.gensalt());
         var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>()));
 
-        assertEquals("user001", getAuthenticator(userList).authenticate(
-            buildCredentials("user001", "password", null)
-        ).get().getName());
+        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
+        assertThat(result).isPresent();
+        assertEquals("user001", result.get().getName());
     }
 
     @Test
-    void authenticate_should_call_delegate_http_service_if_config_says_so() throws AuthenticationException {
+    public void authenticate_should_call_delegate_http_service_if_config_says_so() throws AuthenticationException {
         var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
 
         Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
             .thenReturn(Optional.of("user001"));
 
-        assertEquals("user001", getAuthenticator(userList).authenticate(
-            buildCredentials("user001", "password", null)
-        ).get().getName());
+        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
+        assertThat(result).isPresent();
+        assertEquals("user001", result.get().getName());
     }
 
     @Test
-    void authenticate_should_return_empty_optional_if_delegate_returns_401_unauthorized() throws AuthenticationException {
+    public void authenticate_should_return_empty_optional_if_delegate_returns_different_username() throws AuthenticationException {
+        var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
+
+        Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
+            .thenReturn(Optional.of("user002"));
+
+        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void authenticate_should_return_empty_optional_if_delegate_returns_401_unauthorized_with_basic_authentication() throws AuthenticationException {
         var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
 
         Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
             .thenReturn(Optional.empty());
 
-        assertTrue(getAuthenticator(userList)
-            .authenticate(
-                buildCredentials("user001", "password", null)
-            ).isEmpty());
-
+        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
+        assertThat(result).isEmpty();
     }
 
     @Test
-    void authenticate_should_propagate_AuthenticationException() throws AuthenticationException {
+    public void authenticate_should_return_user_if_header_credentials_are_correct() throws AuthenticationException {
+        var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
+
+        Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
+            .thenReturn(Optional.of("user001"));
+
+        var headers = new MultivaluedHashMap<String, String>();
+        headers.putSingle("x-dataverse-key", "test");
+
+        var result = getAuthenticator(userList).authenticate(new HeaderCredentials(headers));
+        assertThat(result).isPresent();
+        assertEquals("user001", result.get().getName());
+    }
+
+    @Test
+    public void authenticate_should_return_empty_optional_if_delegate_returns_401_unauthorized_with_other_authentication() throws AuthenticationException {
+        var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
+
+        Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
+            .thenReturn(Optional.empty());
+
+        var headers = new MultivaluedHashMap<String, String>();
+        headers.putSingle("x-dataverse-key", "test");
+        var result = getAuthenticator(userList).authenticate(new HeaderCredentials(headers));
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void authenticate_should_return_empty_optional_if_authenticationService_is_null() {
+        var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
+
+        var authenticator = new SwordAuthenticator(userList, null, null);
+        var result = assertDoesNotThrow(() -> authenticator.authenticate(buildCredentials("user001", "password", null)));
+        assertTrue(result.isEmpty());
+    }
+
+
+    @Test
+    public void authenticate_should_propagate_AuthenticationException() throws AuthenticationException {
         var userList = List.of(new UserConfig("user001", null, false, new ArrayList<>()));
 
         Mockito.doThrow(AuthenticationException.class)
             .when(authenticationService).authenticateWithHeaders(Mockito.any());
-
         assertThrows(AuthenticationException.class, () -> getAuthenticator(userList)
             .authenticate(
                 buildCredentials("user001", "password", null)
