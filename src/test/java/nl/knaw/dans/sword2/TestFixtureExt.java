@@ -19,6 +19,7 @@ import io.dropwizard.configuration.FileConfigurationSourceProvider;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import nl.knaw.dans.sword2.config.DdSword2Configuration;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.Collections;

@@ -15,26 +15,32 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
+import nl.knaw.dans.sword2.config.DefaultUserConfig;
 import nl.knaw.dans.sword2.core.auth.Depositor;
-import nl.knaw.dans.sword2.core.config.UserConfig;
+import nl.knaw.dans.sword2.config.UserConfig;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class UserManagerImpl implements UserManager {
     private final Map<String, Depositor> depositorMap = new HashMap<>();
+    private final DefaultUserConfig defaultUserConfig;
 
-    public UserManagerImpl(List<UserConfig> users) {
-        for (var user: users) {
-            var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
-            depositorMap.put(user.getName(), depositor);
+    public UserManagerImpl(List<UserConfig> userConfigs, DefaultUserConfig defaultUserConfig) {
+        if (userConfigs != null) {
+            for (var user : userConfigs) {
+                var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
+                depositorMap.put(user.getName(), depositor);
+            }
         }
+        this.defaultUserConfig = defaultUserConfig;
     }
 
     @Override
     public Depositor getDepositorById(String id) {
-        return depositorMap.get(id);
+        return Optional.ofNullable(depositorMap.get(id)).orElse(new Depositor(id, defaultUserConfig.getFilepathMapping(), Set.copyOf(defaultUserConfig.getCollections())));
     }
 }

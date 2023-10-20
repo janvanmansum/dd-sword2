@@ -12,15 +12,20 @@ server:
   requestLog:
     appenders: [ ]
 
-authorization:
-  passwordDelegate:
-    url: http://localhost:20000/
-    forwardHeaders:
-      - authorization
-      - x-dataverse-key
+userProfiles:
+  default:
+    passwordDelegate:
+      url: http://localhost:20000/
+      forwardHeaders:
+        - authorization
+        - x-dataverse-key
+    collections:
+      - collection1
+    filepathMapping: true
+
   users:
     - name: 'user001'
-      passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y' # user001
+      passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y'
       filepathMapping: true
       collections:
         - collection1

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.sword2.core.config;
+package nl.knaw.dans.sword2.core;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

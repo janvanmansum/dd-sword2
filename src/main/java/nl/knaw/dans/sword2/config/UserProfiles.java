@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.core.service;
+package nl.knaw.dans.sword2.config;
 
-import nl.knaw.dans.sword2.core.auth.Depositor;
-import nl.knaw.dans.sword2.config.CollectionConfig;
-import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+import javax.validation.Valid;
 import java.util.List;
 
-public interface CollectionManager {
+@Data
+public class UserProfiles {
+    @JsonProperty("default")
+    private DefaultUserConfig defaultUserConfig;
 
-    CollectionConfig getCollectionByPath(String id, Depositor depositor) throws CollectionNotFoundException;
-
-    CollectionConfig getCollectionByName(String id) throws CollectionNotFoundException;
-
-    List<CollectionConfig> getCollections(Depositor depositor);
-
-    List<CollectionConfig> getCollections();
+    @Valid
+    private List<UserConfig> users;
 }

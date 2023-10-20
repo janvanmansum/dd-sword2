@@ -25,6 +25,7 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import nl.knaw.dans.sword2.config.DdSword2Configuration;
 import nl.knaw.dans.sword2.core.auth.AuthenticationService;
 import nl.knaw.dans.sword2.core.auth.AuthenticationServiceImpl;
 import nl.knaw.dans.sword2.core.auth.Depositor;
@@ -86,7 +87,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         var errorResponseFactory = new ErrorResponseFactoryImpl();
 
         var bagItManager = new BagItManagerImpl(fileService, checksumCalculator);
-        var userManager = new UserManagerImpl(configuration.getAuthorization().getUsers());
+        var userManager = new UserManagerImpl(configuration.getUserProfiles().getUsers(), configuration.getUserProfiles().getDefaultUserConfig());
 
         var finalizingExecutor = configuration.getSword2().getFinalizingQueue().build(environment);
         var rescheduleExecutor = configuration.getSword2().getRescheduleQueue().build(environment);
@@ -105,7 +106,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
 
         var depositFinalizerManager = new DepositFinalizerManager(finalizingExecutor, depositHandler, queue, rescheduleExecutor, configuration.getSword2().getRescheduleDelay());
 
-        var httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration())
+        var httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClient())
             .build(getName());
 
         environment.jersey().register(MultiPartFeature.class);
@@ -114,14 +115,16 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
         environment.jersey().register(HashHeaderInterceptor.class);
 
         AuthenticationService dataverseAuthenticator = null;
-        if (configuration.getAuthorization().getPasswordDelegateConfig() != null) {
-            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getAuthorization().getPasswordDelegateConfig(), httpClient, environment.getObjectMapper());
+        var defaultUserConfig = configuration.getUserProfiles().getDefaultUserConfig();
+        if (defaultUserConfig != null && defaultUserConfig.getPasswordDelegate() != null) {
+            dataverseAuthenticator = new AuthenticationServiceImpl(configuration.getUserProfiles().getDefaultUserConfig().getPasswordDelegate(), httpClient, environment.getObjectMapper());
         }
 
         environment.jersey().register(new AuthDynamicFeature(
             new HeaderAuthenticationFilter.Builder<Depositor>()
                 .setRealm("Dataverse")
-                .setAuthenticator(new SwordAuthenticator(configuration.getAuthorization(), dataverseAuthenticator))
+                .setAuthenticator(new SwordAuthenticator(configuration.getUserProfiles().getUsers(),
+                    configuration.getUserProfiles().getDefaultUserConfig(), dataverseAuthenticator))
                 .buildAuthFilter()
         ));
 

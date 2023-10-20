@@ -17,7 +17,7 @@ package nl.knaw.dans.sword2.core.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.auth.AuthenticationException;
-import nl.knaw.dans.sword2.core.config.PasswordDelegateConfig;
+import nl.knaw.dans.sword2.config.PasswordDelegateConfig;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -56,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 // only set headers that are configured
                 .filter(h -> allowedHeaders.contains(h.getKey().toLowerCase()))
                 // only set headers that have a value
-                .filter(h -> h.getValue().size() > 0)
+                .filter(h -> !h.getValue().isEmpty())
                 .forEach(h -> request.setHeader(h.getKey().toLowerCase(), h.getValue().get(0)));
 
             // always add this header to have a valid request

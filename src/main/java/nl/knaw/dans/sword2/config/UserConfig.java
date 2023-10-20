@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.sword2.core.service;
+package nl.knaw.dans.sword2.config;
 
-import nl.knaw.dans.sword2.core.auth.Depositor;
-import nl.knaw.dans.sword2.config.CollectionConfig;
-import nl.knaw.dans.sword2.core.exceptions.CollectionNotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public interface CollectionManager {
-
-    CollectionConfig getCollectionByPath(String id, Depositor depositor) throws CollectionNotFoundException;
-
-    CollectionConfig getCollectionByName(String id) throws CollectionNotFoundException;
-
-    List<CollectionConfig> getCollections(Depositor depositor);
-
-    List<CollectionConfig> getCollections();
+@Data
+@AllArgsConstructor // Necessary for the test
+@NoArgsConstructor
+public class UserConfig {
+    @NotEmpty
+    private String name;
+    private String passwordHash;
+    private Boolean filepathMapping;
+    @NotNull
+    private List<String> collections;
 }

@@ -16,11 +16,7 @@
 package nl.knaw.dans.sword2.resources;
 
 import ch.qos.logback.classic.LoggerContext;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
-import nl.knaw.dans.sword2.DdSword2Application;
-import nl.knaw.dans.sword2.DdSword2Configuration;
 import nl.knaw.dans.sword2.TestFixtureExt;
 import nl.knaw.dans.sword2.api.service.ServiceDocument;
 import org.junit.jupiter.api.AfterEach;
