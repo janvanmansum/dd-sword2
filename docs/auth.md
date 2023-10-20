@@ -19,7 +19,7 @@ The `dd-sword2` service can be configured to authenticate users in the following
   with the [BCrypt algorithm](https://en.wikipedia.org/wiki/Bcrypt){:target=_blank}. In the example below the user's password is
   simply "user001":
 
-         userProfiles
+        userProfiles:
             users:
             - name: user001
               passwordHash: '$2a$10$yvmSYczU7z4KL6qmRCTgTeSvo7uurwPUbB9s/mTKzJrYM/sQKgF.y'

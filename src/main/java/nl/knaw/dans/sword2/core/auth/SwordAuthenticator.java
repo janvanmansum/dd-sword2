@@ -66,7 +66,10 @@ public class SwordAuthenticator implements Authenticator<HeaderCredentials, Depo
                 else {
                     log.debug("User is not configured with a password hash, forwarding request to passwordDelegate");
                     userName = delegateAuthentication(credentials);
-                    if (userName.isPresent() && userConfig.getName().equals(userName.get())) {
+                    if (userName.isPresent()) {
+                        if (!userConfig.getName().equals(userName.get())) {
+                            throw new AuthenticationException("Usernames do not match, expected " + userConfig.getName() + " but got " + userName.get() + " from passwordDelegate");
+                        }
                         depositor = Optional.of(new Depositor(userConfig.getName(), userConfig.getFilepathMapping(), Set.copyOf(userConfig.getCollections())));
                     }
                     else {

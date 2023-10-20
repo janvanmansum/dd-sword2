@@ -90,8 +90,8 @@ class SwordAuthenticatorTest {
 
     @Test
     public void authenticate_should_return_empty_optional_if_password_is_incorrect() throws AuthenticationException {
-        var password = BCrypt.hashpw("password", BCrypt.gensalt());
-        var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>()));
+        var encryptedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        var userList = List.of(new UserConfig("user001", encryptedPassword, false, new ArrayList<>()));
 
         var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "incorrect_password", null));
         assertTrue(result.isEmpty());
@@ -99,8 +99,8 @@ class SwordAuthenticatorTest {
 
     @Test
     public void authenticate_should_return_user_if_username_and_password_are_correct() throws AuthenticationException {
-        var password = BCrypt.hashpw("password", BCrypt.gensalt());
-        var userList = List.of(new UserConfig("user001", password, false, new ArrayList<>()));
+        var encryptedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        var userList = List.of(new UserConfig("user001", encryptedPassword, false, new ArrayList<>()));
 
         var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
         assertThat(result).isPresent();
@@ -126,8 +126,7 @@ class SwordAuthenticatorTest {
         Mockito.when(authenticationService.authenticateWithHeaders(Mockito.any()))
             .thenReturn(Optional.of("user002"));
 
-        var result = getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null));
-        assertThat(result).isEmpty();
+        assertThrows(AuthenticationException.class, () -> getAuthenticator(userList).authenticate(buildCredentials("user001", "password", null)));
     }
 
     @Test
@@ -177,7 +176,6 @@ class SwordAuthenticatorTest {
         var result = assertDoesNotThrow(() -> authenticator.authenticate(buildCredentials("user001", "password", null)));
         assertTrue(result.isEmpty());
     }
-
 
     @Test
     public void authenticate_should_propagate_AuthenticationException() throws AuthenticationException {
