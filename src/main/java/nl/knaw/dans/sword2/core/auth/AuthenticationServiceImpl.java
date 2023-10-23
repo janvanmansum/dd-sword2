@@ -18,14 +18,16 @@ package nl.knaw.dans.sword2.core.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.auth.AuthenticationException;
 import nl.knaw.dans.sword2.config.PasswordDelegateConfig;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.glassfish.jersey.message.internal.Statuses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -34,10 +36,10 @@ import java.util.stream.Collectors;
 public class AuthenticationServiceImpl implements AuthenticationService {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     private final PasswordDelegateConfig passwordDelegateConfig;
-    private final HttpClient httpClient;
+    private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public AuthenticationServiceImpl(PasswordDelegateConfig passwordDelegateConfig, HttpClient httpClient, ObjectMapper objectMapper) {
+    public AuthenticationServiceImpl(PasswordDelegateConfig passwordDelegateConfig, CloseableHttpClient httpClient, ObjectMapper objectMapper) {
         this.passwordDelegateConfig = passwordDelegateConfig;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
@@ -61,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             // always add this header to have a valid request
             request.setHeader("Accept", "application/json");
-            log.debug("Headers set to {}", (Object) request.getAllHeaders());
+            log.debug("Headers set to {}", (Object) request.getHeaders());
 
             return doRequest(request);
         }
@@ -71,23 +73,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private Optional<String> doRequest(HttpUriRequest request) throws AuthenticationException, IOException {
-        var response = httpClient.execute(request);
-        var status = response.getStatusLine().getStatusCode();
-        log.debug("Delegate returned status code {}", status);
+        final CloseableHttpResponse response = httpClient.execute(request);
+        final String reasonPhrase = response.getReasonPhrase();
+        int statusCode = response.getCode();
+        final Response.StatusType statusPhrase = Statuses.from(statusCode, reasonPhrase == null ? "" : reasonPhrase);
+        log.debug("Delegate returned status code {}", statusCode);
 
-        switch (status) {
+        switch (statusCode) {
             case 200:
                 return getUsernameFromResponse(response);
             case 401:
                 return Optional.empty();
             default:
-                throw new AuthenticationException(String.format(
-                    "Unexpected status code returned: %s (message: %s)", status, response.getStatusLine().getReasonPhrase()
-                ));
+                throw new AuthenticationException(String.format("Unexpected status code returned: %s (message: %s)", statusCode, statusPhrase));
         }
     }
 
-    private Optional<String> getUsernameFromResponse(HttpResponse response) {
+    private Optional<String> getUsernameFromResponse(CloseableHttpResponse response) {
         try {
             var tree = objectMapper.readTree(response.getEntity().getContent());
             return Optional.ofNullable(tree.get("userId").asText());

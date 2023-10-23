@@ -16,8 +16,8 @@
 
 package nl.knaw.dans.sword2.config;
 
-import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
+import io.dropwizard.core.Configuration;
 import lombok.Data;
 
 import javax.validation.Valid;
