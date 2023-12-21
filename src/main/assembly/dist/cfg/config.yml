@@ -33,6 +33,12 @@ server:
   adminContextPath: /
   applicationContextPath: /
 
+httpClient:
+  timeout: 10s
+  connectionTimeout: 15s
+  timeToLive: 1h
+  retries: 2
+
 sword2:
   baseUrl: # Fill in external base URL of service, e.g., https://yourserver.com/sword2/
   emailAddress: # Admin e-mail address displayed in error messages to client
