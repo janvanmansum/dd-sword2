@@ -103,14 +103,16 @@ sword2:
 #
 logging:
   level: INFO
-  loggers:
-    "nl.knaw.dans": TRACE
   appenders:
     - type: console
       logFormat: "%-5p [%d{ISO8601}] [%t] %c: %m%n%rEx"
     - type: file
       archive: false
       currentLogFilename: data/dd-sword2.log
+  loggers:
+    'nl.knaw.dans': DEBUG
+    'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+
 
 health:
   delayedShutdownHandlerEnabled: false

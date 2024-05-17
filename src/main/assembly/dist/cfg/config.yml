@@ -22,6 +22,8 @@ logging:
       currentLogFilename: /var/opt/dans.knaw.nl/log/dd-sword2/dd-sword2.log
       type: file
       timeZone: system
+  loggers:
+    'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
 
 server:
   applicationConnectors:
