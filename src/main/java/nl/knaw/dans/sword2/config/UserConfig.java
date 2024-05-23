@@ -31,6 +31,5 @@ public class UserConfig {
     private String name;
     private String passwordHash;
     private Boolean filepathMapping;
-    @NotNull
     private List<String> collections;
 }

@@ -16,8 +16,8 @@
 package nl.knaw.dans.sword2.core.service;
 
 import nl.knaw.dans.sword2.config.DefaultUserConfig;
-import nl.knaw.dans.sword2.core.auth.Depositor;
 import nl.knaw.dans.sword2.config.UserConfig;
+import nl.knaw.dans.sword2.core.auth.Depositor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,9 @@ public class UserManagerImpl implements UserManager {
     public UserManagerImpl(List<UserConfig> userConfigs, DefaultUserConfig defaultUserConfig) {
         if (userConfigs != null) {
             for (var user : userConfigs) {
-                var depositor = new Depositor(user.getName(), user.getFilepathMapping(), Set.copyOf(user.getCollections()));
+                var depositor = new Depositor(user.getName(),
+                    user.getFilepathMapping() == null ? defaultUserConfig.getFilepathMapping() : user.getFilepathMapping(),
+                    user.getCollections() == null ? Set.copyOf(defaultUserConfig.getCollections()) : Set.copyOf(user.getCollections()));
                 depositorMap.put(user.getName(), depositor);
             }
         }
