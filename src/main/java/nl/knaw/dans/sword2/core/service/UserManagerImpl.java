@@ -15,16 +15,20 @@
  */
 package nl.knaw.dans.sword2.core.service;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.sword2.config.DefaultUserConfig;
 import nl.knaw.dans.sword2.config.UserConfig;
 import nl.knaw.dans.sword2.core.auth.Depositor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
+@Slf4j
 public class UserManagerImpl implements UserManager {
     private final Map<String, Depositor> depositorMap = new HashMap<>();
     private final DefaultUserConfig defaultUserConfig;
@@ -43,6 +47,16 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public Depositor getDepositorById(String id) {
-        return Optional.ofNullable(depositorMap.get(id)).orElse(new Depositor(id, defaultUserConfig.getFilepathMapping(), Set.copyOf(defaultUserConfig.getCollections())));
-    }
+        var depositor = depositorMap.get(id);
+        if (depositor != null) {
+            return depositor;
+        } else {
+            var collections = defaultUserConfig.getCollections();
+            if (collections == null) {
+                collections = new ArrayList<>();
+                log.warn("No collections configured for default user");
+            }
+            return new Depositor(id, defaultUserConfig.getFilepathMapping(), Set.copyOf(collections));
+        }
+  }
 }
