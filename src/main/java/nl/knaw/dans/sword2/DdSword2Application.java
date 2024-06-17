@@ -139,7 +139,7 @@ public class DdSword2Application extends Application<DdSword2Configuration> {
 
         environment.jersey().register(new ContainerResourceImpl(depositReceiptFactory, depositHandler, errorResponseFactory));
 
-        environment.jersey().register(new StatementResourceImpl(configuration.getSword2().getBaseUrl(), depositHandler, errorResponseFactory));
+        environment.jersey().register(new StatementResourceImpl(configuration.getSword2().getBaseUrl(), configuration.getSword2().getNbnResolverBaseUrl(), depositHandler, errorResponseFactory));
 
         environment.jersey().register(new ServiceDocumentResourceImpl(configuration.getSword2().getCollections(), configuration.getSword2().getBaseUrl()));
 

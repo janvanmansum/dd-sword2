@@ -19,9 +19,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nl.knaw.dans.convert.jackson.StringByteSizeConverter;
 import nl.knaw.dans.sword2.core.DepositState;
-import nl.knaw.dans.sword2.config.converter.StringByteSizeConverter;
-import org.checkerframework.checker.units.qual.N;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;

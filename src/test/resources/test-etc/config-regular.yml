@@ -32,6 +32,7 @@ userProfiles:
 
 sword2:
   baseUrl: 'http://localhost:20320/'
+  nbnResolverBaseUrl: 'https://resolver.tgharvester.dans.knaw.nl'
   emailAddress: 'test@test.com'
   collections:
     - name: 'collection1'

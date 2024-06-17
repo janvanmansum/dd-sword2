@@ -43,6 +43,7 @@ httpClient:
 
 sword2:
   baseUrl: # Fill in external base URL of service, e.g., https://yourserver.com/sword2/
+  nbnResolverBaseUrl: https://persistent-identifier.nl/
   emailAddress: # Admin e-mail address displayed in error messages to client
 
   # One or more collections can be defined. Users are granted permission to deposit by adding the name to the list

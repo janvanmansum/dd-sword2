@@ -15,7 +15,9 @@
  */
 package nl.knaw.dans.sword2.config;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import nl.knaw.dans.convert.jackson.UriAddTrailingSlashConverter;
 import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 
 import javax.validation.Valid;
@@ -30,7 +32,13 @@ import java.util.List;
 public class Sword2Config {
 
     @NotNull
+    @JsonDeserialize(converter = UriAddTrailingSlashConverter.class)
     private URI baseUrl;
+
+    @NotNull
+    @JsonDeserialize(converter = UriAddTrailingSlashConverter.class)
+    private URI nbnResolverBaseUrl;
+
     @Email
     @NotEmpty
     private String emailAddress;

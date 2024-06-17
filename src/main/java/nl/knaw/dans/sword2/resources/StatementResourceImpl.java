@@ -35,8 +35,11 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -44,12 +47,14 @@ public class StatementResourceImpl extends BaseResource implements StatementReso
     private static final Logger log = LoggerFactory.getLogger(StatementResourceImpl.class);
 
     private final URI baseUrl;
+    private final URI nbnResolverBaseUrl;
     private final DepositHandler depositHandler;
 
-    public StatementResourceImpl(URI baseUrl, DepositHandler depositHandler, ErrorResponseFactory errorResponseFactory) {
+    public StatementResourceImpl(URI baseUrl, URI nbnResolverBaseUrl, DepositHandler depositHandler, ErrorResponseFactory errorResponseFactory) {
         super(errorResponseFactory);
         this.baseUrl = baseUrl;
         this.depositHandler = depositHandler;
+        this.nbnResolverBaseUrl = nbnResolverBaseUrl;
     }
 
     @Override
@@ -115,7 +120,7 @@ public class StatementResourceImpl extends BaseResource implements StatementReso
             }
 
             if (StringUtils.isNotBlank(deposit.getUrn())) {
-                var uri = new URI("https://www.persistent-identifier.nl?identifier=" + deposit.getUrn());
+                var uri = nbnResolverBaseUrl.resolve(URLEncoder.encode(deposit.getUrn(), StandardCharsets.UTF_8));
                 entry.getLinks().add(new Link(uri, "self", null));
             }
 
