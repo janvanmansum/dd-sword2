@@ -73,19 +73,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private Optional<String> doRequest(HttpUriRequest request) throws AuthenticationException, IOException {
-        final CloseableHttpResponse response = httpClient.execute(request);
-        final String reasonPhrase = response.getReasonPhrase();
-        int statusCode = response.getCode();
-        final Response.StatusType statusPhrase = Statuses.from(statusCode, reasonPhrase == null ? "" : reasonPhrase);
-        log.debug("Delegate returned status code {}", statusCode);
+        try (var response = httpClient.execute(request)) {
+            final String reasonPhrase = response.getReasonPhrase();
+            int statusCode = response.getCode();
+            final Response.StatusType statusPhrase = Statuses.from(statusCode, reasonPhrase == null ? "" : reasonPhrase);
+            log.debug("Delegate returned status code {}", statusCode);
 
-        switch (statusCode) {
-            case 200:
-                return getUsernameFromResponse(response);
-            case 401:
-                return Optional.empty();
-            default:
-                throw new AuthenticationException(String.format("Unexpected status code returned: %s (message: %s)", statusCode, statusPhrase));
+            return switch (statusCode) {
+                case 200 -> getUsernameFromResponse(response);
+                case 401 -> Optional.empty();
+                default -> throw new AuthenticationException(String.format("Unexpected status code returned: %s (message: %s)", statusCode, statusPhrase));
+            };
         }
     }
 
